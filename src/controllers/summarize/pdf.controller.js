@@ -15,7 +15,7 @@ const handlePDFSummarize = async (req, res) => {
     try {
         const fileCreated = await files.create(fileData);
         const summary = await summarize.pdf(fileCreated.url);
-        res.json(summary);
+        res.status(200).json({ status: 200, data: summary, message: "Summary created successfully." });
     } catch (error) {
         console.log(error)
         res.status(500).send('An error occurred while processing the File.');

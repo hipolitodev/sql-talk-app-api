@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const login = async (user, password) => {
     const isPremium = process.env.PREMIUM_USERS.includes(user.email);
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return;
+    if (!validPassword) return null;
 
     const tokenData = {
         userId: user.id,
