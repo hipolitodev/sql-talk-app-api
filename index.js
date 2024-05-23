@@ -8,9 +8,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 
-const filesRouter = require('./src/routes/files.route');
-const usersRouter = require('./src/routes/users.route');
 const authRouter = require('./src/routes/auth.route');
+const usersRouter = require('./src/routes/users.route');
+const filesRouter = require('./src/routes/files.route');
+const summarizePDFRouter = require('./src/routes/summarize/pdf.route');
 
 app.use(bodyParser.json());
 app.use(
@@ -28,6 +29,7 @@ app.use('/api', authenticateToken);
 app.use('/api', validatePremiumUser);
 
 app.use('/api', filesRouter);
+app.use('/api', summarizePDFRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 

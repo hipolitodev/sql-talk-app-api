@@ -1,9 +1,10 @@
-const files = require('../services/files.service');
-const validateFile = require('../utils/validateFile.util');
+const files = require('../../services/files.service');
+const summarize = require('../../services/summarize');
+const validateFile = require('../../utils/validateFile.util');
 
 const acceptedMimeTypes = ['application/pdf'];
 
-const handleFilesUpload = async (req, res) => {
+const handlePDFSummarize = async (req, res) => {
     validateFile(req.file, res, acceptedMimeTypes);
 
     const fileData = {
@@ -13,11 +14,12 @@ const handleFilesUpload = async (req, res) => {
 
     try {
         const fileCreated = await files.create(fileData);
-        res.json(fileCreated);
+        const summary = await summarize.pdf(fileCreated.url);
+        res.json(summary);
     } catch (error) {
         console.log(error)
         res.status(500).send('An error occurred while processing the File.');
     }
 };
 
-module.exports = { handleFilesUpload };
+module.exports = { handlePDFSummarize };
