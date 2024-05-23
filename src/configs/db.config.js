@@ -15,7 +15,7 @@ pool.connect((err, client, release) => {
             message: 'Error acquiring client' + err.stack,
         });
     }
-    client.query('SELECT NOW()', (err, result) => {
+    client.query('SELECT NOW()', (err) => {
         release();
         if (err) {
             return logger.error({
