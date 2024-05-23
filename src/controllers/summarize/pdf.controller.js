@@ -18,7 +18,13 @@ const handlePDFSummarize = async (req, res) => {
         res.status(200).json({ status: 200, data: summary, message: "Summary created successfully." });
     } catch (error) {
         console.log(error)
-        res.status(500).send('An error occurred while processing the File.');
+        res.status(500).json({
+            status: 500,
+            error: {
+                code: "FILE_PROCESSING_ERROR",
+                message: "An error occurred while processing the File.",
+            },
+        });
     }
 };
 

@@ -20,7 +20,13 @@ const handleUserCreation = async (req, res) => {
         res.status(201).json({ status: 201, data: newUser, message: "User created successfully." });
     } catch (error) {
         console.log(error)
-        res.status(500).send('An error occurred while creating the user.');
+        res.status(500).json({
+            status: 500,
+            error: {
+                code: "USER_CREATION_ERROR",
+                message: "An error occurred while creating the user.",
+            },
+        });
     }
 };
 
