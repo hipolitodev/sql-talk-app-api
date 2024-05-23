@@ -1,11 +1,15 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const { authenticateToken } = require('./src/middlewares/authenticateToken.middleware');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 
 const filesRouter = require('./src/routes/files.route');
 const usersRouter = require('./src/routes/users.route');
+const authRouter = require('./src/routes/auth.route');
 
 app.use(bodyParser.json());
 app.use(
@@ -14,10 +18,10 @@ app.use(
     })
 );
 
-app.get('/', (req, res) => {
-    res.json({ 'message': 'ok' });
-})
+app.use('/api', authRouter);
 
+// Protected routes
+app.use('/api', authenticateToken);
 app.use('/api', filesRouter);
 app.use('/api', usersRouter);
 
