@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const logger = require('../utils/logger.util');
 
 const pool = new Pool({
     user: 'postgres',
@@ -10,14 +11,20 @@ const pool = new Pool({
 
 pool.connect((err, client, release) => {
     if (err) {
-        return console.error('Error acquiring client', err.stack);
+        return logger.error({
+            message: 'Error acquiring client' + err.stack,
+        });
     }
     client.query('SELECT NOW()', (err, result) => {
         release();
         if (err) {
-            return console.error('Error executing query', err.stack);
+            return logger.error({
+                message: 'Error executing query' + err.stack,
+            });
         }
-        console.log('Connected to PostgreSQL:', result.rows);
+        return logger.info({
+            message: 'Connected to PostgreSQL...',
+        });
     });
 });
 

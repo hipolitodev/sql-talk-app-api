@@ -1,18 +1,21 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { authenticateToken } = require('./src/middlewares/authenticateToken.middleware');
 const { validatePremiumUser } = require('./src/middlewares/validatePremiumUser.middleware');
+const { logger } = require('./src/middlewares/logger.middleware');
+const loggerUtil = require('./src/utils/logger.util');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const path = require('path');
 
 const authRouter = require('./src/routes/auth.route');
 const usersRouter = require('./src/routes/users.route');
 const filesRouter = require('./src/routes/files.route');
 const summarizePDFRouter = require('./src/routes/summarize/pdf.route');
 
+app.use(logger);
 app.use(bodyParser.json());
 app.use(
     bodyParser.urlencoded({
@@ -34,5 +37,5 @@ app.use('/api', summarizePDFRouter);
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    loggerUtil.info(`Server is running on http://localhost:${PORT}...`);
 });

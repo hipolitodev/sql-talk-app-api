@@ -1,5 +1,6 @@
 const files = require('../services/files.service');
 const validateFile = require('../utils/validateFile.util');
+const logger = require('../utils/logger.util');
 
 const acceptedMimeTypes = ['application/pdf'];
 
@@ -15,12 +16,18 @@ const handleFilesUpload = async (req, res) => {
         const fileCreated = await files.create(fileData);
         res.status(201).json({ status: 201, data: fileCreated, message: "File created successfully." });
     } catch (error) {
-        console.log(error)
+        const code = "FILE_PROCESSING_ERROR";
+        const message = "An error occurred while processing the File.";
+
+        logger.error({
+            code,
+            message: error.message || error || message,
+        });
         res.status(500).json({
             status: 500,
             error: {
-                code: "FILE_PROCESSING_ERROR",
-                message: "An error occurred while processing the File.",
+                code,
+                message,
             },
         });
     }
