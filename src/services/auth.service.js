@@ -2,19 +2,21 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const login = async (user, password) => {
-    const isPremium = process.env.PREMIUM_USERS.includes(user.email);
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) return null;
+  const isPremium = process.env.PREMIUM_USERS.includes(user.email);
+  const validPassword = await bcrypt.compare(password, user.password);
+  if (!validPassword) return null;
 
-    const tokenData = {
-        userId: user.id,
-        isPremium
-    }
+  const tokenData = {
+    userId: user.id,
+    isPremium,
+  };
 
-    const token = jwt.sign(tokenData, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return token;
-}
+  const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+  return token;
+};
 
 module.exports = {
-    login,
+  login,
 };

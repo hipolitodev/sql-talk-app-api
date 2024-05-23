@@ -9,10 +9,15 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-    pgm.createTable('files', {
-        id: { type: 'uuid', notNull: true, default: pgm.func('uuid_generate_v4()'), primaryKey: true },
-        url: { type: 'text', notNull: true, unique: false },
-    });
+  pgm.createTable('files', {
+    id: {
+      type: 'uuid',
+      notNull: true,
+      default: pgm.func('uuid_generate_v4()'),
+      primaryKey: true,
+    },
+    url: { type: 'text', notNull: true, unique: false },
+  });
 };
 
 /**
@@ -21,5 +26,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-    pgm.dropTable('files');
+  pgm.dropTable('files');
 };

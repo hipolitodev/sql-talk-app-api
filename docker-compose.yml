@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   # app:
   #   build: .
@@ -16,17 +16,17 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - app-network
 
   pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "pgadmin4@pgadmin.org"
-      PGADMIN_DEFAULT_PASSWORD: "admin"
+      PGADMIN_DEFAULT_EMAIL: 'pgadmin4@pgadmin.org'
+      PGADMIN_DEFAULT_PASSWORD: 'admin'
     ports:
-      - "5050:80"
+      - '5050:80'
     depends_on:
       - db
     networks:

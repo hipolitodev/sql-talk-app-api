@@ -5,6 +5,10 @@ const summarizeController = require('../../controllers/summarize');
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
-router.post('/summarize/pdf', upload.single('file'), summarizeController.handlePDFSummarize);
+router.post(
+  '/summarize/pdf',
+  upload.single('file'),
+  summarizeController.handlePDFSummarize,
+);
 
 module.exports = router;

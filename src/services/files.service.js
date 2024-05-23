@@ -7,33 +7,33 @@ const BUCKET_NAME = process.env.BUCKET_NAME;
 const FILES_PATH = process.env.FILES_PATH;
 
 const upload = async ({ user, file }) => {
-    const destFileName = `${FILES_PATH}${user}/${file.originalname}`
-    const filePath = file.path;
+  const destFileName = `${FILES_PATH}${user}/${file.originalname}`;
+  const filePath = file.path;
 
-    const options = {
-        destination: destFileName,
-        preconditionOpts: {},
-    };
+  const options = {
+    destination: destFileName,
+    preconditionOpts: {},
+  };
 
-    const response = await storage.bucket(BUCKET_NAME).upload(filePath, options);
+  const response = await storage.bucket(BUCKET_NAME).upload(filePath, options);
 
-    return response;
-}
+  return response;
+};
 
 const create = async (data) => {
-    const uploadedFile = await upload(data);
+  const uploadedFile = await upload(data);
 
-    const fileUrl = `gs://${BUCKET_NAME}/${uploadedFile[0].metadata.name}`
+  const fileUrl = `gs://${BUCKET_NAME}/${uploadedFile[0].metadata.name}`;
 
-    const result = await pool.query(
-        'INSERT INTO files (url) VALUES ($1) RETURNING *',
-        [fileUrl]
-    );
+  const result = await pool.query(
+    'INSERT INTO files (url) VALUES ($1) RETURNING *',
+    [fileUrl],
+  );
 
-    return result.rows[0];
-}
+  return result.rows[0];
+};
 
 module.exports = {
-    upload,
-    create,
+  upload,
+  create,
 };
