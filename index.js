@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3000;
 const path = require('path');
 
 const filesRouter = require('./src/routes/files.route');
+const usersRouter = require('./src/routes/users.route');
 
 app.use(bodyParser.json());
 app.use(
@@ -18,6 +19,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api', filesRouter);
+app.use('/api', usersRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
