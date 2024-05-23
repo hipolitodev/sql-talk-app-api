@@ -19,12 +19,7 @@ async function summarizePDF(fileUri) {
   const streamingResp = await generativeModel.generateContentStream(req);
   const response = await streamingResp.response;
 
-  return response;
-  // for await (const item of streamingResp.stream) {
-  //     process.stdout.write('stream chunk: ' + JSON.stringify(item) + '\n');
-  // }
-
-  // process.stdout.write('aggregated response: ' + JSON.stringify(await streamingResp.response));
+  return response.candidates[0].content.parts;
 }
 
 module.exports = {

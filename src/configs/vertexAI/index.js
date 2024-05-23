@@ -6,6 +6,7 @@ const model = process.env.MODEL_NAME;
 const vertex_ai = new VertexAI({
   project: process.env.PROJECT_ID,
   location: process.env.LOCATION,
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
 
 const generativeModel = vertex_ai.preview.getGenerativeModel({

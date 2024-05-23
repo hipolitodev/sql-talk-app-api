@@ -1,10 +1,11 @@
 const { Storage } = require('@google-cloud/storage');
 const pool = require('../configs/db.config');
 
-const storage = new Storage();
-
 const BUCKET_NAME = process.env.BUCKET_NAME;
 const FILES_PATH = process.env.FILES_PATH;
+const storage = new Storage({
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS
+});
 
 const upload = async ({ user, file }) => {
   const destFileName = `${FILES_PATH}${user}/${file.originalname}`;
