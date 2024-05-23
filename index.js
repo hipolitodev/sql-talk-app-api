@@ -2,6 +2,8 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 const {
   authenticateToken,
 } = require('./src/middlewares/authenticateToken.middleware');
@@ -18,6 +20,7 @@ const authRouter = require('./src/routes/auth.route');
 const usersRouter = require('./src/routes/users.route');
 const filesRouter = require('./src/routes/files.route');
 const summarizePDFRouter = require('./src/routes/summarize/pdf.route');
+const swaggerDocument = YAML.load('./src/configs/docs.config.yaml');
 
 app.use(logger);
 app.use(bodyParser.json());
@@ -26,6 +29,7 @@ app.use(
     extended: true,
   }),
 );
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Public routes
 app.use('/api', authRouter);

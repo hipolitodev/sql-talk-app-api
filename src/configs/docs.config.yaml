@@ -1,0 +1,271 @@
+openapi: 3.0.0
+info:
+  title: BookWorm
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/
+    description: Development server
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Users
+  - name: Auth
+  - name: Summarize
+  - name: Files
+paths:
+  /api/users:
+    post:
+      tags:
+        - Users
+      summary: Add User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                username: Gaylord.Ziemann82
+                name: Lillie Monahan
+                email: Demetrius_Schaefer74@hotmail.com
+                password: StrongPass!456
+      responses:
+        '201':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: '5b2e7d18-6270-4081-a6b2-f8669d527d23'
+                      username:
+                        type: string
+                        example: 'Gaylord.Ziemann82'
+                      name:
+                        type: string
+                        example: 'Lillie Monahan'
+                      email:
+                        type: string
+                        example: 'Demetrius_Schaefer74@hotmail.com'
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: '2024-05-23T21:42:25.995Z'
+                  message:
+                    type: string
+                    example: 'User created successfully.'
+        '500':
+          description: An error occurred while creating the User.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: 'USER_CREATION_ERROR'
+                      message:
+                        type: string
+                        example: 'An error occurred while creating the user.'
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                email: michael.brown@example.com
+                password: StrongPass!456
+      responses:
+        '200':
+          description: User logged in successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: 'eyJhbGciOi...'
+                  message:
+                    type: string
+                    example: 'User logged in successfully.'
+        '401':
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 401
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: 'INVALID_CREDENTIALS'
+                      message:
+                        type: string
+                        example: 'Invalid credentials.'
+        '500':
+          description: An error occurred while logging in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: 'LOGIN_ERROR'
+                      message:
+                        type: string
+                        example: 'An error occurred while logging in.'
+  /api/summarize/pdf:
+    post:
+      tags:
+        - Summarize
+      summary: Summarize PDF
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Summary created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          example: 'The title of the document is "Statement by FDIC Chairm...'
+                  message:
+                    type: string
+                    example: 'Summary created successfully.'
+        '500':
+          description: An error occurred while processing the PDF.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: 'FILE_PROCESSING_ERROR'
+                      message:
+                        type: string
+                        example: 'An error occurred while processing the PDF.'
+  /api/files:
+    post:
+      tags:
+        - Files
+      summary: Save File
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: File created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 'c38d368f-3baf-4659-8bf0-3fa1b898ce23'
+                      url:
+                        type: string
+                        example: 'gs://google-cloud-bucket/files/user-id/file-name.pdf'
+                  message:
+                    type: string
+                    example: 'File created successfully.'
+        '500':
+          description: An error occurred while processing the File.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 500
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: 'FILE_PROCESSING_ERROR'
+                      message:
+                        type: string
+                        example: 'An error occurred while processing the File.'

@@ -25,7 +25,7 @@ const handlePDFSummarize = async (req, res) => {
       });
   } catch (error) {
     const code = 'FILE_PROCESSING_ERROR';
-    const message = 'An error occurred while processing the File.';
+    const message = 'An error occurred while processing the PDF.';
 
     logger.error({
       code,
