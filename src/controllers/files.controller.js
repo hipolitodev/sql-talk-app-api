@@ -4,12 +4,12 @@ const handleFilesUpload = async (req, res) => {
     validateFile(req.file, res);
 
     const fileData = {
-        user: "testing-hipolito",
+        user: req.user.userId,
         file: req.file,
     }
 
     try {
-        const summary = await files.upload(fileData);
+        const summary = await files.create(fileData);
         res.json(summary);
     } catch (error) {
         console.log(error)
