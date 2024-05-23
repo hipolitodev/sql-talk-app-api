@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
@@ -22,6 +23,7 @@ const filesRouter = require('./src/routes/files.route');
 const summarizePDFRouter = require('./src/routes/summarize/pdf.route');
 const swaggerDocument = YAML.load('./src/configs/docs.config.yaml');
 
+app.use(cors());
 app.use(logger);
 app.use(bodyParser.json());
 app.use(
