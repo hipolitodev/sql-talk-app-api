@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const path = require('path');
 
-const pdfRouter = require('./src/routes/pdf.route');
+const filesRouter = require('./src/routes/files.route');
 
 app.use(bodyParser.json());
 app.use(
@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
     res.json({ 'message': 'ok' });
 })
 
-app.use('/api', pdfRouter);
+app.use('/api', filesRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
