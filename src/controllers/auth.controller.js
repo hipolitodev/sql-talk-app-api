@@ -24,13 +24,11 @@ const handleLogin = async (req, res) => {
         },
       });
 
-    res
-      .status(200)
-      .json({
-        status: 200,
-        data: { token },
-        message: 'User logged in successfully.',
-      });
+    res.status(200).json({
+      status: 200,
+      data: { token },
+      message: 'User logged in successfully.',
+    });
   } catch (error) {
     const code = 'LOGIN_ERROR';
     const message = 'An error occurred while logging in.';

@@ -18,13 +18,11 @@ const handleUserCreation = async (req, res) => {
   try {
     const newUser = await users.create(req.body);
     delete newUser.password;
-    res
-      .status(201)
-      .json({
-        status: 201,
-        data: newUser,
-        message: 'User created successfully.',
-      });
+    res.status(201).json({
+      status: 201,
+      data: newUser,
+      message: 'User created successfully.',
+    });
   } catch (error) {
     const code = 'USER_CREATION_ERROR';
     const message = 'An error occurred while creating the user.';

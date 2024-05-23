@@ -16,13 +16,11 @@ const handlePDFSummarize = async (req, res) => {
   try {
     const fileCreated = await files.create(fileData);
     const summary = await summarize.pdf(fileCreated.url);
-    res
-      .status(200)
-      .json({
-        status: 200,
-        data: summary,
-        message: 'Summary created successfully.',
-      });
+    res.status(200).json({
+      status: 200,
+      data: summary,
+      message: 'Summary created successfully.',
+    });
   } catch (error) {
     const code = 'FILE_PROCESSING_ERROR';
     const message = 'An error occurred while processing the PDF.';
