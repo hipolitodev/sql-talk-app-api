@@ -9,8 +9,8 @@ const handleFilesUpload = async (req, res) => {
     }
 
     try {
-        const summary = await files.create(fileData);
-        res.json(summary);
+        const fileCreated = await files.create(fileData);
+        res.json(fileCreated);
     } catch (error) {
         console.log(error)
         res.status(500).send('An error occurred while processing the File.');

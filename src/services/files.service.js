@@ -15,7 +15,7 @@ const upload = async ({ user, file }) => {
         preconditionOpts: {},
     };
 
-    // const response = await storage.bucket(BUCKET_NAME).upload(filePath, options);
+    const response = await storage.bucket(BUCKET_NAME).upload(filePath, options);
 
     return response;
 }
@@ -23,11 +23,12 @@ const upload = async ({ user, file }) => {
 const create = async (data) => {
     const uploadedFile = await upload(data);
 
+    const fileUrl = `gs://${BUCKET_NAME}/${uploadedFile[0].metadata.name}`
+
     const result = await pool.query(
         'INSERT INTO files (url) VALUES ($1) RETURNING *',
-        [uploadedFile[1].selfLink]
+        [fileUrl]
     );
-
 
     return result.rows[0];
 }

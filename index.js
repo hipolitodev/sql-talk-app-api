@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const { authenticateToken } = require('./src/middlewares/authenticateToken.middleware');
+const { validatePremiumUser } = require('./src/middlewares/validatePremiumUser.middleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,12 +19,15 @@ app.use(
     })
 );
 
+// Public routes
 app.use('/api', authRouter);
+app.use('/api', usersRouter);
 
 // Protected routes
 app.use('/api', authenticateToken);
+app.use('/api', validatePremiumUser);
+
 app.use('/api', filesRouter);
-app.use('/api', usersRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
