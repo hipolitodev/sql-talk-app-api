@@ -7,10 +7,16 @@ This is the backend API for the Bookworm application. It uses Node.js, Express, 
 - Node.js
 - PostgreSQL
 - A Google Cloud account
+- Google Cloud Storage
+- Vertex AI
+- A JWT secret for signing JWTs
+- A list of premium users
 
 ## Environment Variables
 
 You need to set the following environment variables:
+
+### DATABASE SETTINGS
 
 - `DATABASE_URL`: The connection string for your PostgreSQL database.
 - `DB_USER`: The username for your PostgreSQL database.
@@ -18,17 +24,36 @@ You need to set the following environment variables:
 - `DB_NAME`: The name of your PostgreSQL database.
 - `DB_PASSWORD`: The password for your PostgreSQL database.
 - `DB_PORT`: The port of your PostgreSQL database.
+
+### GOOGLE API
+
+- `GOOGLE_APPLICATION_CREDENTIALS`: The path to your Google Cloud service account key file.
+
+### GOOGLE CLOUD STORAGE SETTINGS
+
 - `BUCKET_NAME`: The name of your Google Cloud Storage bucket.
 - `FILES_PATH`: The path in the bucket where files should be stored.
+
+### VERTEX API SETTINGS
+
 - `MODEL_NAME`: The name of your VertexAI model.
 - `PROJECT_ID`: Your Google Cloud project ID.
 - `LOCATION`: The location of your VertexAI model.
 - `MAX_OUTPUT_TOKENS`: The maximum number of output tokens for your VertexAI model.
 - `TEMPERATURE`: The temperature for your VertexAI model.
 - `TOP_P`: The top-p value for your VertexAI model.
+
+### API SETTINGS
+
 - `JWT_SECRET`: The secret for signing JWTs.
-- `PREMIUM_USERS`: A list of premium users.
-- `GOOGLE_APPLICATION_CREDENTIALS`: The path to your Google Cloud service account key file.
+- `PREMIUM_USERS`: A list of premium users, they will have complete access to the app.
+
+### PGADMIN SETTINGS
+
+#### ONLY IF USING WITH DOCKER COMPOSE
+
+- `PGADMIN_DEFAULT_EMAIL`: Your email for PgAdmin.
+- `PGADMIN_DEFAULT_PASSWORD`: Your password for PgAdmin.
 
 ## Running the Application
 
