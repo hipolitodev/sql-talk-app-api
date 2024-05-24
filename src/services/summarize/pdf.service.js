@@ -3,7 +3,7 @@ const {
   instructions,
 } = require('../../configs/vertexAI/generativeModel.config');
 const { sendDataToClients } = require('../websocket.service');
-const logger = require('../utils/logger.util');
+const logger = require('../../utils/logger.util');
 
 async function summarizePDF(fileUri) {
   const pdf = {
