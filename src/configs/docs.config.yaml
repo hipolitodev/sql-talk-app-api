@@ -186,6 +186,44 @@ paths:
                     items:
                       type: object
                       properties:
+                        Title:
+                          type: string
+                          example: 'Statement by FDIC Chairman Jelena McWilliams on the Notice of Proposed Rulemaking on Revisions to the Community Reinvestment Act Regulations'
+                        Author:
+                          type: string
+                          example: 'Jelena McWilliams'
+                        Year:
+                          type: string
+                          example: '2019'
+                        Key Aspects:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              Key Idea:
+                                type: string
+                                example: 'The banking industry has changed...'
+                              Page:
+                                type: string
+                                example: '1'
+                  message:
+                    type: string
+                    example: 'Summary created successfully.'
+        '200':
+          description: Summary created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
                         text:
                           type: string
                           example: 'The title of the document is "Statement by FDIC Chairm...'
