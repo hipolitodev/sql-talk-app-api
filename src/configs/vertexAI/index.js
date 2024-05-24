@@ -18,7 +18,7 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
     topP: process.env.TOP_P || 0.95,
   },
   safetySettings,
-  systemInstruction
+  systemInstruction,
 });
 
 module.exports = generativeModel;

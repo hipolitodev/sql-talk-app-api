@@ -1,6 +1,9 @@
 const generativeModel = require('../../configs/vertexAI');
-const { instructions } = require('../../configs/vertexAI/generativeModel.config');
+const {
+  instructions,
+} = require('../../configs/vertexAI/generativeModel.config');
 const { sendDataToClients } = require('../websocket.service');
+const logger = require('../utils/logger.util');
 
 async function summarizePDF(fileUri) {
   const pdf = {
@@ -22,18 +25,25 @@ async function summarizePDF(fileUri) {
 
   const response = await streamingResp.response;
 
-  const parsedJson = parseJsonText((response.candidates[0].content.parts[0].text));
+  const parsedJson = parseJsonText(
+    response.candidates[0].content.parts[0].text,
+  );
   sendDataToClients(parsedJson);
 
   return parsedJson;
 }
 
 function parseJsonText(text) {
+  // eslint-disable-next-line no-useless-escape
   const cleanedText = text.replace(/^\`\`\`json\s*|\s*\`\`\`$/g, '');
 
   try {
     return JSON.parse(cleanedText);
   } catch (error) {
+    logger.error({
+      code: 'PARSING_ERROR',
+      message: error.message || error,
+    });
     return text;
   }
 }
