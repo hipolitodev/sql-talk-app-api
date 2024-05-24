@@ -1,6 +1,7 @@
 const { VertexAI } = require('@google-cloud/vertexai');
 
 const safetySettings = require('./safetySettings.config');
+const systemInstruction = require('./systemInstruction.config');
 
 const model = process.env.MODEL_NAME;
 const vertex_ai = new VertexAI({
@@ -17,6 +18,7 @@ const generativeModel = vertex_ai.preview.getGenerativeModel({
     topP: process.env.TOP_P || 0.95,
   },
   safetySettings,
+  systemInstruction
 });
 
 module.exports = generativeModel;

@@ -23,6 +23,7 @@ services:
       PREMIUM_USERS: ${PREMIUM_USERS}
     ports:
       - '3000:3000'
+      - '8080:8080'
     networks:
       - app-network
     depends_on:
