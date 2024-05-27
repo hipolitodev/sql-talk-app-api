@@ -21,10 +21,8 @@ const PORT = process.env.PORT || 3000;
 
 const authRouter = require('./src/routes/auth.route');
 const usersRouter = require('./src/routes/users.route');
-const filesRouter = require('./src/routes/files.route');
 const chatsRouter = require('./src/routes/chats.route');
 const messagesRouter = require('./src/routes/messages.route');
-const summarizePDFRouter = require('./src/routes/summarize/pdf.route');
 const swaggerDocument = YAML.load('./src/configs/docs.config.yaml');
 
 app.use(cors());
@@ -47,8 +45,6 @@ app.use('/api', validatePremiumUser);
 
 app.use('/api', chatsRouter);
 app.use('/api', messagesRouter);
-app.use('/api', filesRouter);
-app.use('/api', summarizePDFRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
