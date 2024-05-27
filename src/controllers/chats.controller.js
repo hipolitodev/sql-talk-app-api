@@ -2,10 +2,10 @@ const chats = require('../services/chats.service');
 const logger = require('../utils/logger.util');
 
 const handleChatsCreation = async (req, res) => {
-  const { userId } = req.user;
+  const { id } = req.user;
 
   try {
-    const chatCreated = await chats.create({ user_id: userId });
+    const chatCreated = await chats.create({ user_id: id });
     res.status(201).json({
       status: 201,
       data: chatCreated,
@@ -30,10 +30,10 @@ const handleChatsCreation = async (req, res) => {
 };
 
 const handleGetAllChatsByUser = async (req, res) => {
-  const { userId } = req.user;
+  const { id } = req.user;
 
   try {
-    const chatsByUser = await chats.getAllByUser({ user_id: userId });
+    const chatsByUser = await chats.getAllByUser({ user_id: id });
     res.status(200).json({
       status: 200,
       data: chatsByUser,

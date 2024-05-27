@@ -7,7 +7,7 @@ const login = async (user, password) => {
   if (!validPassword) return null;
 
   const tokenData = {
-    userId: user.id,
+    id: user.id,
     isPremium,
   };
 

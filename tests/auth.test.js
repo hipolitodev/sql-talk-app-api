@@ -27,7 +27,7 @@ describe('Auth Service', () => {
     expect(result).toBe('fakeToken');
     expect(bcrypt.compare).toHaveBeenCalledWith(password, mockUser.password);
     expect(jwt.sign).toHaveBeenCalledWith(
-      { userId: mockUser.id, isPremium: false },
+      { id: mockUser.id, isPremium: false },
       process.env.JWT_SECRET,
       { expiresIn: '1h' },
     );

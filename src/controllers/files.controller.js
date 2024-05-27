@@ -8,7 +8,7 @@ const handleFilesUpload = async (req, res) => {
   validateFile(req.file, res, acceptedMimeTypes);
 
   const fileData = {
-    user: req.user.userId,
+    user: req.user.id,
     file: req.file,
   };
 

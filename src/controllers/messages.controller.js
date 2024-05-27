@@ -4,8 +4,8 @@ const logger = require('../utils/logger.util');
 const handleMessagesCreation = async (req, res) => {
   const messageData = {
     chat_id: req.params.chatID,
-    user_id: req.user.userId,
-    sender: req.user.userId ? 'USER' : 'MODEL',
+    user_id: req.user.id,
+    sender: req.user.id ? 'USER' : 'MODEL',
     content: req.body.content,
   };
 

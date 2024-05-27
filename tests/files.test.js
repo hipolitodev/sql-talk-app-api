@@ -20,7 +20,7 @@ describe('Files Controller', () => {
     pool.query.mockResolvedValue({ rows: [mockFile] });
 
     const req = {
-      user: { userId: '1' },
+      user: { id: '1' },
       file: { ...mockFile },
     };
 
@@ -28,7 +28,7 @@ describe('Files Controller', () => {
     filesService.create.mockResolvedValue(mockFile);
 
     const result = await filesService.create({
-      user: req.user.userId,
+      user: req.user.id,
       file: req.file,
     });
     expect(result).toEqual(mockFile);
@@ -36,7 +36,7 @@ describe('Files Controller', () => {
 
   it('should return 500 when file upload fails', async () => {
     const req = {
-      user: { userId: '1' },
+      user: { id: '1' },
       file: {},
     };
     const res = {
@@ -53,7 +53,7 @@ describe('Files Controller', () => {
       'application/pdf',
     ]);
     expect(filesService.create).toHaveBeenCalledWith({
-      user: req.user.userId,
+      user: req.user.id,
       file: req.file,
     });
     expect(res.status).toHaveBeenCalledWith(500);

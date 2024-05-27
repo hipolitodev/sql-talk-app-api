@@ -13,6 +13,8 @@ const {
 } = require('./src/middlewares/validatePremiumUser.middleware');
 const { logger } = require('./src/middlewares/logger.middleware');
 const loggerUtil = require('./src/utils/logger.util');
+// eslint-disable-next-line no-unused-vars
+const { wss } = require('./src/services/websocket.service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
