@@ -13,8 +13,8 @@ components:
 tags:
   - name: Users
   - name: Auth
-  - name: Summarize
-  - name: Files
+  - name: Chats
+  - name: Messages
 paths:
   /api/users:
     post:
