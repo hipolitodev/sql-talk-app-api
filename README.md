@@ -1,13 +1,12 @@
-# Bookworm API
+# SQL TALK APP API
 
-This is the backend API for the Bookworm application. It uses Node.js, Express, and PostgreSQL for the backend, and Google Cloud Storage and VertexAI for file storage and AI functionalities.
+This is the backend API for the SQL TALK APP application. It uses Node.js, Express, and PostgreSQL for the backend, and Google Cloud Storage and VertexAI for file storage and AI functionalities.
 
 ## Prerequisites
 
 - Node.js
 - PostgreSQL
 - A Google Cloud account
-- Google Cloud Storage
 - Vertex AI
 - A JWT secret for signing JWTs
 - A list of premium users
@@ -28,11 +27,6 @@ You need to set the following environment variables:
 ### GOOGLE API
 
 - `GOOGLE_APPLICATION_CREDENTIALS`: The path to your Google Cloud service account key file.
-
-### GOOGLE CLOUD STORAGE SETTINGS
-
-- `BUCKET_NAME`: The name of your Google Cloud Storage bucket.
-- `FILES_PATH`: The path in the bucket where files should be stored.
 
 ### VERTEX API SETTINGS
 
@@ -85,3 +79,18 @@ If you have Docker and Docker Compose installed, you can use Docker Compose to r
 ## API Documentation
 
 Please refer to the [API documentation](/api-docs/) for more information about the API endpoints.
+
+## Recommended Usage
+
+1. Create an user.
+2. Login with your user.
+3. Create a chat.
+4. Open a websocket to the the app.
+5. Authenticate on the socket sending a json like:
+   ```
+    {"type":"auth","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6I..."}'
+   ``` 
+6. Send a message json like:
+   ```
+    {"type":"chat","chatId":"550cdd31-bbe6-4d5f-9293-75da740ef59b","content":"What kind of information is in this database?"}
+   ``` 
