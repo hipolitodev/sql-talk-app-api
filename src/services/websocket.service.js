@@ -131,9 +131,9 @@ module.exports = { wss };
 JSON.stringify({
   type: 'auth',
   token:
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImI4MTRlOTZhLWRjMjItNGQ4Ni1iOWM0LWNjYTZiNGI2MDhiYyIsImlzUHJlbWl1bSI6dHJ1ZSwiaWF0IjoxNzE2Nzk3MjQ0LCJleHAiOjE3MTY4MDA4NDR9.nt1Xb63JKMB8UJDSRt2Tz-yRofZjRcUc6NLNU_uzvL8',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI4OWM5Y2E1LWNmZjgtNGZkOC05MTk4LWU1MDBkOTBmNzQ1YyIsImlzUHJlbWl1bSI6dHJ1ZSwiaWF0IjoxNzE2ODQyNDgzLCJleHAiOjE3MTY4NDYwODN9.588TNY6oaqJvx-w4cK8syZ-C4tKaVjRdNk8lNKLNZMs',
 });
 JSON.stringify({
-  chatId: '8cad6960-1360-4150-96df-79987d458ebb',
+  chatId: '494cd487-af18-499a-bd49-fce4e801a53b',
   content: 'testing ws',
 });

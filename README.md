@@ -51,7 +51,7 @@ You need to set the following environment variables:
 
 ## Running the Application
 
-1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/bookworm`
+1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/sql-talk-app-api`
 2. Install the dependencies: `npm install`
 3. Set the environment variables.
 4. Run the application: `npm start`
@@ -60,8 +60,8 @@ You need to set the following environment variables:
 
 If you have Docker and Docker Compose installed, you can use Docker Compose to run the application and its dependencies.
 
-1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/bookworm`
-2. Navigate to the project directory: `cd bookworm-api`
+1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/sql-talk-app-api`
+2. Navigate to the project directory: `cd ql-talk-app-api`
 3. Create a `.env` file in the project directory and set the environment variables. Here's an example of what your `.env` file could look like:
 4. Run the application with Docker Compose: `docker-compose up`. This will start your application and the PostgreSQL database in separate Docker containers. Your application will be accessible at http://localhost:3000.
 5. When you're done, you can stop your application by running docker-compose down. This command will stop and remove the Docker containers
