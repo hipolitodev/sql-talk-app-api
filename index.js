@@ -51,3 +51,5 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.listen(PORT, () => {
   loggerUtil.info(`Server is running on http://localhost:${PORT}...`);
 });
+
+module.exports = app;

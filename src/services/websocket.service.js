@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const messages = require('../services/messages.service');
-const { startChat, sendPrompt, } = require('../services/functionCalling/index');
+const { startChat, sendPrompt } = require('../services/functionCalling/index');
 
 const wss = new WebSocket.Server({ port: 8080 });
 console.log('Starting WebSocket server');
@@ -100,7 +100,11 @@ const handleIncomingMessage = async (ws, message) => {
 
     const modelResponse = await sendPrompt({ chat: ws.chat, prompt: content });
 
-    ws.chats[chatId].push({ sender: 'MODEL', content: modelResponse, timestamp });
+    ws.chats[chatId].push({
+      sender: 'MODEL',
+      content: modelResponse,
+      timestamp,
+    });
     ws.send(
       JSON.stringify({
         chatId,

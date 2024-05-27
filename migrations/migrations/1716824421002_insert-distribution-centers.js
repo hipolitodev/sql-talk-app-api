@@ -9,7 +9,7 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-    pgm.sql(`
+  pgm.sql(`
       INSERT INTO distribution_centers VALUES
       (1, 'Memphis TN', 35.1174, -89.9711),
       (2, 'Chicago IL', 41.8369, -87.6847),
@@ -22,7 +22,7 @@ exports.up = (pgm) => {
       (9, 'Charleston SC', 32.7833, -79.9333),
       (10, 'Savannah GA', 32.0167, -81.1167);
     `);
-}
+};
 
 /**
  * @param pgm {import('node-pg-migrate').MigrationBuilder}
@@ -30,7 +30,7 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-    pgm.sql(`
+  pgm.sql(`
       DELETE FROM distribution_centers;
     `);
 };

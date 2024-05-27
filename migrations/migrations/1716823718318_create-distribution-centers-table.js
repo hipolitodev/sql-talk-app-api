@@ -9,12 +9,12 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-    pgm.createTable('distribution_centers', {
-        id: { type: 'integer', primaryKey: true, notNull: true },
-        name: { type: 'string', notNull: false },
-        latitude: { type: 'float', notNull: false },
-        longitude: { type: 'float', notNull: false },
-    });
+  pgm.createTable('distribution_centers', {
+    id: { type: 'integer', primaryKey: true, notNull: true },
+    name: { type: 'string', notNull: false },
+    latitude: { type: 'float', notNull: false },
+    longitude: { type: 'float', notNull: false },
+  });
 };
 
 /**
@@ -23,5 +23,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-    pgm.dropTable('distribution_centers');
+  pgm.dropTable('distribution_centers');
 };

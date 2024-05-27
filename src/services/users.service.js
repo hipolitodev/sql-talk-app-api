@@ -14,9 +14,10 @@ const create = async (user) => {
 };
 
 const getUser = async (email) => {
-  const result = await pool.query('SELECT * FROM internal_users WHERE email = $1', [
-    email,
-  ]);
+  const result = await pool.query(
+    'SELECT * FROM internal_users WHERE email = $1',
+    [email],
+  );
 
   return result.rows[0];
 };
