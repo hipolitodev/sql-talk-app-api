@@ -13,7 +13,8 @@ const functionAction = async () => {
             FROM information_schema.tables
             WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
             AND table_name NOT LIKE 'pg_%'
-            AND table_name NOT LIKE '%migration%';
+            AND table_name NOT LIKE '%migration%'
+            AND table_name NOT IN ('internal_users', 'chats', 'messages', 'files');
         `);
 
         const response = {

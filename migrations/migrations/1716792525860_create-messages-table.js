@@ -25,7 +25,7 @@ exports.up = (pgm) => {
     user_id: {
       type: 'uuid',
       notNull: false,
-      references: 'users',
+      references: 'internal_users',
       onDelete: 'SET NULL',
     },
     sender: { type: 'varchar(10)', notNull: true },

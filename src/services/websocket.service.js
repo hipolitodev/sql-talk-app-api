@@ -1,6 +1,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const messages = require('../services/messages.service');
+const { startChat, sendPrompt, } = require('../services/functionCalling/index');
 
 const wss = new WebSocket.Server({ port: 8080 });
 console.log('Starting WebSocket server');
@@ -80,6 +81,11 @@ const handleIncomingMessage = async (ws, message) => {
       ws.chats[chatId] = [];
     }
 
+    if (!ws.chat) {
+      const { chat } = await startChat();
+      ws.chat = chat;
+    }
+
     const timestamp = new Date().toISOString();
 
     ws.chats[chatId].push({ sender: ws.user.id, content, timestamp });
@@ -92,13 +98,13 @@ const handleIncomingMessage = async (ws, message) => {
     };
     await messages.create(messageData);
 
-    const modelResponse = aiRespond(content);
+    const modelResponse = await sendPrompt({ chat: ws.chat, prompt: content });
 
-    ws.chats[chatId].push({ sender: 'AI', content: modelResponse, timestamp });
+    ws.chats[chatId].push({ sender: 'MODEL', content: modelResponse, timestamp });
     ws.send(
       JSON.stringify({
         chatId,
-        sender: 'AI',
+        sender: 'MODEL',
         content: modelResponse,
         timestamp,
       }),
@@ -114,10 +120,6 @@ const handleIncomingMessage = async (ws, message) => {
   } catch (error) {
     ws.send(JSON.stringify({ message: 'Failed to process message', error }));
   }
-};
-
-const aiRespond = (message) => {
-  return `AI response to "${message}"`;
 };
 
 module.exports = { wss };

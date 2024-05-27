@@ -10,7 +10,7 @@ exports.shorthands = undefined;
  */
 exports.up = (pgm) => {
   pgm.createExtension('uuid-ossp', { ifNotExists: true });
-  pgm.createTable('users', {
+  pgm.createTable('internal_users', {
     id: {
       type: 'uuid',
       notNull: true,
@@ -35,6 +35,6 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('users');
+  pgm.dropTable('internal_users');
   pgm.dropExtension('uuid-ossp');
 };

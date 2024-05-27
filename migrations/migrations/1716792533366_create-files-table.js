@@ -26,7 +26,7 @@ exports.up = (pgm) => {
     user_id: {
       type: 'uuid',
       notNull: false,
-      references: 'users',
+      references: 'internal_users',
       onDelete: 'SET NULL',
     },
     created_at: {

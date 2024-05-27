@@ -2,13 +2,13 @@ require('dotenv').config();
 const generateModel = require('../../../src/configs/vertexAI');
 const { getTable, listTables, sqlQuery } = require('./functions');
 
-const prompts = [
-    "What kind of information is in this database?",
-    "What percentage of orders are returned?",
-    "How is inventory distributed across our regional distribution centers?",
-    "Do customers typically place more than one order?",
-    "Which product categories have the highest profit margins?",
-]
+// const prompts = [
+//     "What kind of information is in this database?",
+//     "What percentage of orders are returned?",
+//     "How is inventory distributed across our regional distribution centers?",
+//     "Do customers typically place more than one order?",
+//     "Which product categories have the highest profit margins?",
+// ]
 
 const getEnhancedPrompt = (prompt) => {
     return `${prompt}
@@ -27,7 +27,7 @@ const getEnhancedPrompt = (prompt) => {
     `;
 }
 
-const startChat = async (prompt) => {
+const startChat = async () => {
     const function_declarations = [
         {
             functionDeclarations: [
@@ -39,12 +39,9 @@ const startChat = async (prompt) => {
     ];
 
     const model = await generateModel([function_declarations]);
-    const chat = model.startChat();
+    const chat = await model.startChat();
 
-    const enhancedPrompt = getEnhancedPrompt(prompt);
-    const messageResponse = await chat.sendMessage(enhancedPrompt);
-
-    return { chat, messageResponse };
+    return { chat };
 }
 
 const parseMessage = (result) => {
@@ -117,20 +114,7 @@ const processFunctionCalls = async ({ initialCall, chat }) => {
     return { response, apiRequestsAndResponses };
 }
 
-const initiateChat = async (prompt) => {
-    const { chat, messageResponse } = await startChat(prompt);
-    const { call, parts } = parseMessage(messageResponse);
-    if (!call) return { chat, response: parts };
-
-    const { response, apiRequestsAndResponses } = await processFunctionCalls({
-        initialCall: call,
-        chat,
-    });
-
-    return { chat, response, apiRequestsAndResponses };
-}
-
-const sendFollowingPrompt = async ({ chat, prompt }) => {
+const sendPrompt = async ({ chat, prompt }) => {
     const enhancedPrompt = getEnhancedPrompt(prompt);
     const messageResponse = await chat.sendMessage(enhancedPrompt);
     const { call, parts } = parseMessage(messageResponse);
@@ -144,28 +128,34 @@ const sendFollowingPrompt = async ({ chat, prompt }) => {
     return { response, apiRequestsAndResponses };
 }
 
+module.exports = {
+    startChat,
+    sendPrompt,
+}
+
 const test = async () => {
     // const prompt = prompts[3];
-    const prompt = 'What kind of information is in this database?'
-    console.log(JSON.stringify({ prompt }, null, 2));
-    const { chat, ...initialResponse } = await initiateChat(prompt);
-    console.log(JSON.stringify({ initialResponse }, null, 2));
+    const { chat } = await startChat();
 
-    console.log('Waiting for 60s before sending the next message...')
-    await new Promise(resolve => setTimeout(resolve, 60000));
+    const initialPrompt = 'What kind of information is in this database?'
+    console.log(JSON.stringify({ initialPrompt }, null, 2));
+    const initialResponse = await sendPrompt({ chat, prompt: initialPrompt });
+    console.log(JSON.stringify({ initialResponse }, null, 2));
 
     const followingPrompt = 'give me information about the orders table'
     console.log(JSON.stringify({ followingPrompt }, null, 2));
-    const followingResponse = await sendFollowingPrompt({ chat, prompt: followingPrompt });
+    const followingResponse = await sendPrompt({ chat, prompt: followingPrompt });
     console.log(JSON.stringify({ followingResponse }, null, 2));
-
-    console.log('Waiting for 60s before sending the next message...')
-    await new Promise(resolve => setTimeout(resolve, 60000));
 
     const followingPrompt2 = 'how many order did the user with id 67'
     console.log(JSON.stringify({ followingPrompt2 }, null, 2));
-    const followingResponse2 = await sendFollowingPrompt({ chat, prompt: followingPrompt2 });
+    const followingResponse2 = await sendPrompt({ chat, prompt: followingPrompt2 });
     console.log(JSON.stringify({ followingResponse2 }, null, 2));
 }
 
-test()
+
+JSON.stringify({
+    chatId: '550cdd31-bbe6-4d5f-9293-75da740ef59b',
+    content: 'What kind of information is in this database?',
+});
+
