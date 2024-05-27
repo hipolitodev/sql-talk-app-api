@@ -92,5 +92,5 @@ Please refer to the [API documentation](/api-docs/) for more information about t
    ``` 
 6. Send a message json like:
    ```
-    {"type":"chat","chatId":"550cdd31-bbe6-4d5f-9293-75da740ef59b","content":"What kind of information is in this database?"}
+    {"chatId":"550cdd31-bbe6-4d5f-9293-75da740ef59b","content":"What kind of information is in this database?"}
    ``` 
