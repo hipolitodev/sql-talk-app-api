@@ -11,9 +11,7 @@ const login = async (user, password) => {
     isPremium,
   };
 
-  const token = jwt.sign(tokenData, process.env.JWT_SECRET, {
-    expiresIn: '1h',
-  });
+  const token = jwt.sign(tokenData, process.env.JWT_SECRET,);
   return token;
 };
 

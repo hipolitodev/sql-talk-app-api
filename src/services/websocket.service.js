@@ -66,7 +66,7 @@ wss.on('connection', (ws) => {
 
 const handleIncomingMessage = async (ws, message) => {
   try {
-    const { chatId, content } = message;
+    const { chatId, content, dontSave } = message;
 
     if (!chatId || !content) {
       ws.send(JSON.stringify({ error: 'Invalid message format' }));
@@ -90,15 +90,17 @@ const handleIncomingMessage = async (ws, message) => {
 
     ws.chats[chatId].push({ sender: ws.user.id, content, timestamp });
 
-    const messageData = {
-      chat_id: chatId,
-      user_id: ws.user.id,
-      sender: 'USER',
-      content: content,
-    };
-    await messages.create(messageData);
+    if (!dontSave) {
+      const messageData = {
+        chat_id: chatId,
+        user_id: ws.user.id,
+        sender: 'USER',
+        content: content,
+      };
+      await messages.create(messageData);
+    }
 
-    const modelResponse = await sendPrompt({ chat: ws.chat, prompt: content });
+    const modelResponse = await sendPrompt({ chat: ws.chat, prompt: content, ws });
 
     ws.chats[chatId].push({
       sender: 'MODEL',

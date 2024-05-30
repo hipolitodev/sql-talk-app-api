@@ -81,7 +81,7 @@ const handleFunctionCall = async (call) => {
   return apiResponse;
 };
 
-const processFunctionCalls = async ({ initialCall, chat }) => {
+const processFunctionCalls = async ({ initialCall, chat, ws }) => {
   let call = initialCall;
   let response;
   let functionCallingInProcess = true;
@@ -104,6 +104,7 @@ const processFunctionCalls = async ({ initialCall, chat }) => {
     const apiMessageParsed = parseMessage(apiMessageResponse);
 
     apiRequestsAndResponses.push({ call, apiResponse, apiMessageParsed });
+    ws.send(JSON.stringify({ type: "log", call, apiResponse, apiMessageParsed }));
 
     if (apiMessageParsed.call) {
       call = apiMessageParsed.call;
@@ -116,7 +117,7 @@ const processFunctionCalls = async ({ initialCall, chat }) => {
   return { response, apiRequestsAndResponses };
 };
 
-const sendPrompt = async ({ chat, prompt }) => {
+const sendPrompt = async ({ chat, prompt, ws }) => {
   const enhancedPrompt = getEnhancedPrompt(prompt);
   const messageResponse = await chat.sendMessage(enhancedPrompt);
   const { call, parts } = parseMessage(messageResponse);
@@ -125,6 +126,7 @@ const sendPrompt = async ({ chat, prompt }) => {
   const { response, apiRequestsAndResponses } = await processFunctionCalls({
     initialCall: call,
     chat,
+    ws
   });
 
   return { response, apiRequestsAndResponses };
