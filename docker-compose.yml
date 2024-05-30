@@ -1,57 +1,57 @@
 version: '3'
 services:
-  # app:
-  #   build: .
-  #   container_name: app
-  #   command: sh -c "npm install && npm run migrate:up && npm start"
-  #   environment:
-  #     DATABASE_URL: ${DATABASE_URL}
-  #     DB_USER: ${DB_USER}
-  #     DB_HOST: ${DB_HOST}
-  #     DB_NAME: ${DB_NAME}
-  #     DB_PASSWORD: ${DB_PASSWORD}
-  #     DB_PORT: ${DB_PORT}
-  #     BUCKET_NAME: ${BUCKET_NAME}
-  #     FILES_PATH: ${FILES_PATH}
-  #     MODEL_NAME: ${MODEL_NAME}
-  #     PROJECT_ID: ${PROJECT_ID}
-  #     LOCATION: ${LOCATION}
-  #     MAX_OUTPUT_TOKENS: ${MAX_OUTPUT_TOKENS}
-  #     TEMPERATURE: ${TEMPERATURE}
-  #     TOP_P: ${TOP_P}
-  #     JWT_SECRET: ${JWT_SECRET}
-  #     PREMIUM_USERS: ${PREMIUM_USERS}
-  #   ports:
-  #     - '3000:3000'
-  #     - '8080:8080'
-  #   networks:
-  #     - app-network
-  #   depends_on:
-  #     - db
-  #   restart: on-failure
-
-  # db:
-  #   image: postgres:latest
-  #   container_name: db
-  #   environment:
-  #     POSTGRES_DB: ${DB_NAME}
-  #     POSTGRES_USER: ${DB_USER}
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #   ports:
-  #     - '5432:5432'
-  #   networks:
-  #     - app-network
-  #   restart: on-failure
-
-  pgadmin:
-    image: dpage/pgadmin4
+  app:
+    build: .
+    container_name: app
+    command: sh -c "npm install && npm run migrate:up && npm start"
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
+      DB_USER: ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      BUCKET_NAME: ${BUCKET_NAME}
+      FILES_PATH: ${FILES_PATH}
+      MODEL_NAME: ${MODEL_NAME}
+      PROJECT_ID: ${PROJECT_ID}
+      LOCATION: ${LOCATION}
+      MAX_OUTPUT_TOKENS: ${MAX_OUTPUT_TOKENS}
+      TEMPERATURE: ${TEMPERATURE}
+      TOP_P: ${TOP_P}
+      JWT_SECRET: ${JWT_SECRET}
+      PREMIUM_USERS: ${PREMIUM_USERS}
     ports:
-      - '5050:80'
+      - '3000:3000'
+      - '8080:8080'
     networks:
       - app-network
+    depends_on:
+      - db
+    restart: on-failure
+
+  db:
+    image: postgres:latest
+    container_name: db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '5432:5432'
+    networks:
+      - app-network
+    restart: on-failure
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - '5050:80'
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
