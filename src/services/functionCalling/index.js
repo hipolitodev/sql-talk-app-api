@@ -1,6 +1,13 @@
 require('dotenv').config();
 const generateModel = require('../../../src/configs/vertexAI');
-const { getTable, listTables, sqlQuery } = require('./functions');
+const {
+  getTable,
+  getTableForeignKeys,
+  listAllColumns,
+  listTables,
+  listTablesRelationships,
+  sqlQuery,
+} = require('./functions');
 
 // const prompts = [
 //     "What kind of information is in this database?",
@@ -11,19 +18,17 @@ const { getTable, listTables, sqlQuery } = require('./functions');
 // ]
 
 const getEnhancedPrompt = (prompt) => {
-  return `${prompt}
-            Please give a concise, high-level summary followed by detail in
-            plain language about where the information in your response is
-            coming from in the database. Only use information that you learn
-            from PostgreSQL, do not make up information.
-
-            You can ask for a list of tables in the database, information
-            about a specific table, or run a SQL query to get the information.
-
-            For example, you can ask for the lists of tables in the database,
-            and then when you see a table that you want more information about,
-            you can ask for information about that table. Then you can ask
-            for the information you need from that table by running a SQL query.
+  return `
+You are a data analyst at a large e-commerce company. 
+The company has a PostgreSQL database that contains information.
+You have access to the database and can run queries to get the
+information you need. 
+Don't make assumptions about the data, only use the information
+you learn from the database.
+${prompt}
+Before making a query, you should list the tables, choose the right one(s), and then list the columns, foreign keys, or relationships.
+And only then, when you fully understand the database structure, you can make a query. In case of error try again.
+If you need additional information, ask for it.
     `;
 };
 
@@ -32,7 +37,10 @@ const startChat = async () => {
     {
       functionDeclarations: [
         getTable.functionDeclaration,
+        getTableForeignKeys.functionDeclaration,
+        listAllColumns.functionDeclaration,
         listTables.functionDeclaration,
+        listTablesRelationships.functionDeclaration,
         sqlQuery.functionDeclaration,
       ],
     },
@@ -47,8 +55,18 @@ const startChat = async () => {
 const parseMessage = (result) => {
   let parts = [];
   const candidate = result?.response?.candidates[0];
-  const call = candidate?.content?.parts[0]?.functionCall;
+  let call;
 
+  if (candidate?.content?.parts && Array.isArray(candidate.content.parts) && candidate.content.parts.length > 0) {
+    isThereCall = candidate.content.parts.map(part => part.functionCall).filter(Boolean);
+    if (isThereCall.length > 0) {
+      call = isThereCall[0];
+    }
+    isThereText = candidate.content.parts.map(part => part.text).filter(Boolean);
+    if (isThereText.length > 0) {
+      parts = isThereText;
+    }
+  }
   if (!call) {
     parts = candidate?.content?.parts;
   }
@@ -65,11 +83,20 @@ const handleFunctionCall = async (call) => {
   }
 
   switch (call.name) {
-    case 'get_table':
+    case 'get_table_columns':
       apiResponse = await getTable.functionAction(params);
       break;
-    case 'list_tables':
+    case 'get_table_foreign_keys':
+      apiResponse = await getTableForeignKeys.functionAction(params);
+      break;
+    case 'list_all_columns_in_database':
+      apiResponse = await listAllColumns.functionAction(params);
+      break;
+    case 'list_all_tables':
       apiResponse = await listTables.functionAction(params);
+      break;
+    case 'list_relationships_between_tables':
+      apiResponse = await listTablesRelationships.functionAction(params);
       break;
     case 'sql_query':
       apiResponse = await sqlQuery.functionAction(params);
@@ -81,16 +108,34 @@ const handleFunctionCall = async (call) => {
   return apiResponse;
 };
 
-const processFunctionCalls = async ({ initialCall, chat, ws }) => {
+const processFunctionCalls = async ({ initialCall, chat, ws, modelMessage }) => {
   let call = initialCall;
   let response;
   let functionCallingInProcess = true;
   const apiRequestsAndResponses = [];
 
+  let startTime = Date.now();
+  let callCount = 0;
+
   while (functionCallingInProcess) {
+    callCount++;
+    if (callCount > 5) {
+      let endTime = Date.now();
+      let elapsedTime = endTime - startTime;
+
+      if (elapsedTime < 60000) {
+        let delay = 60000 - elapsedTime;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+
+      startTime = Date.now();
+      callCount = 0;
+    }
+
     const apiResponse = await handleFunctionCall(call);
 
-    const apiMessageResponse = await chat.sendMessage([
+    await new Promise((resolve) => setTimeout(resolve, 12000));
+    const modelMessage = await chat.sendMessage([
       {
         functionResponse: {
           name: call.name,
@@ -101,16 +146,21 @@ const processFunctionCalls = async ({ initialCall, chat, ws }) => {
       },
     ]);
 
-    const apiMessageParsed = parseMessage(apiMessageResponse);
+    const modelMessageParsed = parseMessage(modelMessage);
 
-    apiRequestsAndResponses.push({ call, apiResponse, apiMessageParsed });
-    ws.send(JSON.stringify({ type: "log", call, apiResponse, apiMessageParsed }));
+    apiRequestsAndResponses.push({ call, apiResponse, modelMessageParsed });
+    if (modelMessageParsed.parts) {
+      ws.send(JSON.stringify({
+        ...modelMessage,
+        content: modelMessageParsed.parts
+      }));
+    }
 
-    if (apiMessageParsed.call) {
-      call = apiMessageParsed.call;
+    if (modelMessageParsed.call) {
+      call = modelMessageParsed.call;
     } else {
       functionCallingInProcess = false;
-      response = apiMessageParsed.parts;
+      response = modelMessageParsed.parts;
     }
   }
 

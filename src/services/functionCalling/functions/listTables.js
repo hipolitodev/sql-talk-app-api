@@ -1,27 +1,23 @@
 const pool = require('../../../configs/db.config');
 
 const functionDeclaration = {
-  name: 'list_tables',
+  name: 'list_all_tables',
   description:
-    "List tables in a database that will help choose the right table to answer the user's question",
+    "To get a list of all tables in the database.",
 };
 
 const functionAction = async () => {
   try {
-    const queryResult = await pool.query(`
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
-            AND table_name NOT LIKE 'pg_%'
-            AND table_name NOT LIKE '%migration%'
-            AND table_name NOT IN ('internal_users', 'chats', 'messages', 'files');
+    const result = await pool.query(`
+          SELECT table_name
+          FROM information_schema.tables
+          WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+          AND table_name NOT LIKE 'pg_%'
+          AND table_name NOT LIKE '%migration%'
+          AND table_name NOT IN ('internal_users', 'chats', 'messages', 'files');
         `);
 
-    const response = {
-      tables: queryResult.rows.map((row) => row.table_name),
-    };
-
-    return response;
+    return result.rows;
   } catch (error) {
     return error;
   }

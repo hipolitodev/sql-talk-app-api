@@ -10,7 +10,7 @@ const functionDeclaration = {
       query: {
         type: FunctionDeclarationSchemaType.STRING,
         description:
-          "SQL query on a single line that will help give quantitative answers to the user's question when run on a PostgreSQL database and table.",
+          "Standard SQL query to get information from tables in PostgreSQL. Example: SELECT * FROM table_name WHERE column_name = 'value';",
       },
     },
     required: ['query'],
@@ -20,7 +20,7 @@ const functionDeclaration = {
 const functionAction = async ({ query }) => {
   try {
     const result = await pool.query(query);
-
+    const rows = result.rows
     return result.rows;
   } catch (error) {
     return error;

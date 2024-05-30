@@ -12,7 +12,18 @@ wss.on('connection', (ws) => {
   ws.isAuthenticated = false;
 
   ws.on('message', async (message) => {
-    const data = JSON.parse(message);
+    if (!message) {
+      console.log('Received undefined message');
+      return;
+    }
+
+    let data;
+    try {
+      data = JSON.parse(message);
+    } catch (err) {
+      console.log('Failed to parse message:', message);
+      return;
+    }
 
     if (data.type === 'auth') {
       const token = data.token;
@@ -100,7 +111,13 @@ const handleIncomingMessage = async (ws, message) => {
       await messages.create(messageData);
     }
 
-    const modelResponse = await sendPrompt({ chat: ws.chat, prompt: content, ws });
+    const modelResponse = await sendPrompt({
+      chat: ws.chat, prompt: content, ws, modelMessage: {
+        chat_id: chatId,
+        user_id: ws.user.id,
+        sender: 'MODEL',
+      }
+    });
 
     ws.chats[chatId].push({
       sender: 'MODEL',
@@ -124,6 +141,7 @@ const handleIncomingMessage = async (ws, message) => {
     };
     await messages.create(messageDataModel);
   } catch (error) {
+    console.log(error)
     ws.send(JSON.stringify({ message: 'Failed to process message', error }));
   }
 };
@@ -136,6 +154,6 @@ JSON.stringify({
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjI4OWM5Y2E1LWNmZjgtNGZkOC05MTk4LWU1MDBkOTBmNzQ1YyIsImlzUHJlbWl1bSI6dHJ1ZSwiaWF0IjoxNzE2ODQyNDgzLCJleHAiOjE3MTY4NDYwODN9.588TNY6oaqJvx-w4cK8syZ-C4tKaVjRdNk8lNKLNZMs',
 });
 JSON.stringify({
-  chatId: '494cd487-af18-499a-bd49-fce4e801a53b',
+  chatId: '84b01b38-f485-4c56-a2e5-7a655586092d',
   content: 'testing ws',
 });
