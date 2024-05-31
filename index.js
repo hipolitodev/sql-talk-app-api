@@ -33,7 +33,7 @@ app.use(
     extended: true,
   }),
 );
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Public routes
 app.use('/api', authRouter);
