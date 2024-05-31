@@ -8,6 +8,7 @@ const {
   listTablesRelationships,
   sqlQuery,
 } = require('./functions');
+const messages = require('../messages.service');
 
 const getEnhancedPrompt = (prompt) => {
   return `
@@ -187,6 +188,13 @@ const sendPrompt = async ({ chat, prompt, ws, modelMessageData }) => {
     ws,
     modelMessageData
   });
+
+  const messageDataModel = {
+    ...modelMessageData,
+    content: { response, apiRequestsAndResponses },
+  };
+
+  await messages.create(messageDataModel);
 
   return { response, apiRequestsAndResponses };
 };

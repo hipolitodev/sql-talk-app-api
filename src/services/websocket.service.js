@@ -102,16 +102,25 @@ const createSocketServer = (server) => {
         await messages.create(messageData);
       }
 
-      const modelResponse = await sendPrompt({
-        chat: ws.chat,
-        prompt: content,
-        ws,
-        modelMessageData: {
-          chat_id: chatId,
-          user_id: ws.user.id,
-          sender: 'MODEL',
-        },
-      });
+      let modelResponse;
+      try {
+        modelResponse = await sendPrompt({
+          chat: ws.chat,
+          prompt: content,
+          ws,
+          modelMessageData: {
+            chat_id: chatId,
+            user_id: ws.user.id,
+            sender: 'MODEL',
+          },
+        });
+      } catch (error) {
+        if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
+          console.log('WebSocket connection closed, but sendPrompt will continue running.');
+        } else {
+          throw error;
+        }
+      }
 
       ws.chats[chatId].push({
         sender: 'MODEL',
@@ -127,14 +136,6 @@ const createSocketServer = (server) => {
           timestamp,
         }),
       );
-
-      const messageDataModel = {
-        chat_id: chatId,
-        user_id: ws.user.id,
-        sender: 'MODEL',
-        content: modelResponse,
-      };
-      await messages.create(messageDataModel);
     } catch (error) {
       logger.info(error);
       ws.send(JSON.stringify({ message: 'Failed to process message', error }));
@@ -145,4 +146,3 @@ const createSocketServer = (server) => {
 }
 
 module.exports = { createSocketServer };
-
