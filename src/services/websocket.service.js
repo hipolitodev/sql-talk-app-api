@@ -11,8 +11,6 @@ const createSocketServer = (server) => {
   wss.on('connection', (ws) => {
     logger.info('A new client connected');
 
-    ws.isAuthenticated = false;
-
     ws.on('message', async (message) => {
       if (!message) {
         logger.info('Received undefined message');
@@ -27,7 +25,7 @@ const createSocketServer = (server) => {
         return;
       }
 
-      if (data.type === 'auth') {
+      if (!!data.token) {
         const token = data.token;
         if (!token) {
           ws.send(
@@ -55,18 +53,9 @@ const createSocketServer = (server) => {
           }
 
           ws.user = user;
-          ws.isAuthenticated = true;
-          ws.send(
-            JSON.stringify({
-              type: 'auth',
-              success: true,
-              message: 'Authentication successful',
-            }),
-          );
+          handleIncomingMessage(ws, data);
           logger.info(`User ${user.id} authenticated successfully`);
         });
-      } else if (ws.isAuthenticated) {
-        await handleIncomingMessage(ws, data);
       } else {
         ws.send(JSON.stringify({ error: 'Authentication required' }));
       }
