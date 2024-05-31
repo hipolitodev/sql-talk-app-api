@@ -78,7 +78,7 @@ If you have Docker and Docker Compose installed, you can use Docker Compose to r
 
 ## API Documentation
 
-Please refer to the [API documentation](/api-docs/) for more information about the API endpoints.
+Please refer to the [API documentation](https://sql-talk-app-api.hipolito.dev/api-docs/) for more information about the API endpoints.
 
 ## Recommended Usage
 
