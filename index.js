@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -14,7 +15,7 @@ const {
 const { logger } = require('./src/middlewares/logger.middleware');
 const loggerUtil = require('./src/utils/logger.util');
 // eslint-disable-next-line no-unused-vars
-const { wss } = require('./src/services/websocket.service');
+const { createSocketServer } = require('./src/services/websocket.service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,6 +49,11 @@ app.use('/api', messagesRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.listen(PORT, () => {
+// Create an HTTP server
+const server = http.createServer(app);
+
+createSocketServer(server);
+
+server.listen(PORT, () => {
   loggerUtil.info(`Server is running on http://localhost:${PORT}...`);
 });
