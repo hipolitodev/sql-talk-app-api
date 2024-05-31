@@ -19,17 +19,15 @@ const {
 
 const getEnhancedPrompt = (prompt) => {
   return `
-You are a data analyst at a large e-commerce company. 
-The company has a PostgreSQL database that contains information.
-You have access to the database and can run queries to get the
-information you need. 
-Don't make assumptions about the data, only use the information
-you learn from the database.
+You are a data analyst at a large e-commerce company and you have access to their PostgreSQL database.
+When asked a question, don't make assumptions about the data, only use the information you learn from the database.
+You can ask questions about the database structure, list all the tables, list all columns in the database, list relationships between tables and make SQL queries.
+
+Before crafting your own query make sure all the fields that you are using exists, do not guess o make assumptions about them.
+In case of error try again. If you need additional information, ask for it.
+
 ${prompt}
-Before making a query, you should list the tables, choose the right one(s), and then list the columns, foreign keys, or relationships.
-And only then, when you fully understand the database structure, you can make a query. In case of error try again.
-If you need additional information, ask for it.
-    `;
+`;
 };
 
 const startChat = async () => {
@@ -203,28 +201,28 @@ module.exports = {
   sendPrompt,
 };
 
-// const test = async () => {
-//   // const prompt = prompts[3];
-//   const { chat } = await startChat();
+const test = async () => {
+  // const prompt = prompts[3];
+  const { chat } = await startChat();
 
-//   const initialPrompt = 'What kind of information is in this database?';
-//   console.log(JSON.stringify({ initialPrompt }, null, 2));
-//   const initialResponse = await sendPrompt({ chat, prompt: initialPrompt });
-//   console.log(JSON.stringify({ initialResponse }, null, 2));
+  const initialPrompt = 'What kind of information is in this database?';
+  console.log(JSON.stringify({ initialPrompt }, null, 2));
+  const initialResponse = await sendPrompt({ chat, prompt: initialPrompt });
+  console.log(JSON.stringify({ initialResponse }, null, 2));
 
-//   const followingPrompt = 'give me information about the orders table';
-//   console.log(JSON.stringify({ followingPrompt }, null, 2));
-//   const followingResponse = await sendPrompt({ chat, prompt: followingPrompt });
-//   console.log(JSON.stringify({ followingResponse }, null, 2));
+  const followingPrompt = 'give me information about the orders table';
+  console.log(JSON.stringify({ followingPrompt }, null, 2));
+  const followingResponse = await sendPrompt({ chat, prompt: followingPrompt });
+  console.log(JSON.stringify({ followingResponse }, null, 2));
 
-//   const followingPrompt2 = 'how many order did the user with id 67';
-//   console.log(JSON.stringify({ followingPrompt2 }, null, 2));
-//   const followingResponse2 = await sendPrompt({
-//     chat,
-//     prompt: followingPrompt2,
-//   });
-//   console.log(JSON.stringify({ followingResponse2 }, null, 2));
-// };
+  const followingPrompt2 = 'how many order did the user with id 67';
+  console.log(JSON.stringify({ followingPrompt2 }, null, 2));
+  const followingResponse2 = await sendPrompt({
+    chat,
+    prompt: followingPrompt2,
+  });
+  console.log(JSON.stringify({ followingResponse2 }, null, 2));
+};
 
 // JSON.stringify({
 //   chatId: '550cdd31-bbe6-4d5f-9293-75da740ef59b',

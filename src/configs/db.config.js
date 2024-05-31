@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const logger = require('../utils/logger.util');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL + '?sslmode=require',
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
