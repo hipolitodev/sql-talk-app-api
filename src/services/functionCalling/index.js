@@ -57,12 +57,20 @@ const parseMessage = (result) => {
   const candidate = result?.response?.candidates[0];
   let call;
 
-  if (candidate?.content?.parts && Array.isArray(candidate.content.parts) && candidate.content.parts.length > 0) {
-    isThereCall = candidate.content.parts.map(part => part.functionCall).filter(Boolean);
+  if (
+    candidate?.content?.parts &&
+    Array.isArray(candidate.content.parts) &&
+    candidate.content.parts.length > 0
+  ) {
+    let isThereCall = candidate.content.parts
+      .map((part) => part.functionCall)
+      .filter(Boolean);
     if (isThereCall.length > 0) {
       call = isThereCall[0];
     }
-    isThereText = candidate.content.parts.map(part => part.text).filter(Boolean);
+    let isThereText = candidate.content.parts
+      .map((part) => part.text)
+      .filter(Boolean);
     if (isThereText.length > 0) {
       parts = isThereText;
     }
@@ -108,7 +116,12 @@ const handleFunctionCall = async (call) => {
   return apiResponse;
 };
 
-const processFunctionCalls = async ({ initialCall, chat, ws, modelMessage }) => {
+const processFunctionCalls = async ({
+  initialCall,
+  chat,
+  ws,
+  modelMessageData,
+}) => {
   let call = initialCall;
   let response;
   let functionCallingInProcess = true;
@@ -125,7 +138,7 @@ const processFunctionCalls = async ({ initialCall, chat, ws, modelMessage }) => 
 
       if (elapsedTime < 60000) {
         let delay = 60000 - elapsedTime;
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
       startTime = Date.now();
@@ -150,10 +163,12 @@ const processFunctionCalls = async ({ initialCall, chat, ws, modelMessage }) => 
 
     apiRequestsAndResponses.push({ call, apiResponse, modelMessageParsed });
     if (modelMessageParsed.parts) {
-      ws.send(JSON.stringify({
-        ...modelMessage,
-        content: modelMessageParsed.parts
-      }));
+      ws.send(
+        JSON.stringify({
+          ...modelMessageData,
+          content: modelMessageParsed.parts,
+        }),
+      );
     }
 
     if (modelMessageParsed.call) {
@@ -167,7 +182,7 @@ const processFunctionCalls = async ({ initialCall, chat, ws, modelMessage }) => 
   return { response, apiRequestsAndResponses };
 };
 
-const sendPrompt = async ({ chat, prompt, ws }) => {
+const sendPrompt = async ({ chat, prompt, ws, modelMessageData }) => {
   const enhancedPrompt = getEnhancedPrompt(prompt);
   const messageResponse = await chat.sendMessage(enhancedPrompt);
   const { call, parts } = parseMessage(messageResponse);
@@ -176,7 +191,8 @@ const sendPrompt = async ({ chat, prompt, ws }) => {
   const { response, apiRequestsAndResponses } = await processFunctionCalls({
     initialCall: call,
     chat,
-    ws
+    ws,
+    modelMessageData
   });
 
   return { response, apiRequestsAndResponses };

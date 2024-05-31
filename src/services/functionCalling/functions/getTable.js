@@ -4,7 +4,7 @@ const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 const functionDeclaration = {
   name: 'get_table_columns',
   description:
-    "Get Columns for a Specific Table, To get information about the columns of a specific table.",
+    'Get Columns for a Specific Table, To get information about the columns of a specific table.',
   parameters: {
     type: FunctionDeclarationSchemaType.OBJECT,
     properties: {
@@ -32,7 +32,7 @@ const functionAction = async ({ table_id }) => {
         `;
 
     const result = await pool.query(columnQuery);
-    return result.rows
+    return result.rows;
   } catch (error) {
     return error;
   }

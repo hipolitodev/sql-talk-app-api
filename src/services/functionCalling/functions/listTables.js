@@ -2,8 +2,7 @@ const pool = require('../../../configs/db.config');
 
 const functionDeclaration = {
   name: 'list_all_tables',
-  description:
-    "To get a list of all tables in the database.",
+  description: 'To get a list of all tables in the database.',
 };
 
 const functionAction = async () => {

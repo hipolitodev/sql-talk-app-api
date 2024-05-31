@@ -21,7 +21,7 @@ wss.on('connection', (ws) => {
     try {
       data = JSON.parse(message);
     } catch (err) {
-      console.log('Failed to parse message:', message);
+      console.log('Failed to parse message:', err);
       return;
     }
 
@@ -112,11 +112,14 @@ const handleIncomingMessage = async (ws, message) => {
     }
 
     const modelResponse = await sendPrompt({
-      chat: ws.chat, prompt: content, ws, modelMessage: {
+      chat: ws.chat,
+      prompt: content,
+      ws,
+      modelMessageData: {
         chat_id: chatId,
         user_id: ws.user.id,
         sender: 'MODEL',
-      }
+      },
     });
 
     ws.chats[chatId].push({
@@ -141,7 +144,7 @@ const handleIncomingMessage = async (ws, message) => {
     };
     await messages.create(messageDataModel);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     ws.send(JSON.stringify({ message: 'Failed to process message', error }));
   }
 };

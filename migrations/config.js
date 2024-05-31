@@ -7,6 +7,6 @@ module.exports = {
   checkOrder: true,
   ignorePattern: 'config.js',
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 };

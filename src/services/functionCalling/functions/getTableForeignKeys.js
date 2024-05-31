@@ -3,7 +3,8 @@ const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 
 const functionDeclaration = {
   name: 'get_table_foreign_keys',
-  description: "Get Foreign Keys of a Table. To find the foreign keys in a specific table.",
+  description:
+    'Get Foreign Keys of a Table. To find the foreign keys in a specific table.',
   parameters: {
     type: FunctionDeclarationSchemaType.OBJECT,
     properties: {
@@ -29,7 +30,7 @@ const functionAction = async ({ table_id }) => {
         `;
 
     const result = await pool.query(columnQuery);
-    return result.rows
+    return result.rows;
   } catch (error) {
     return error;
   }

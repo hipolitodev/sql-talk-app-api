@@ -4,8 +4,8 @@ const logger = require('../utils/logger.util');
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL + '?sslmode=require',
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 pool.connect((err, client, release) => {

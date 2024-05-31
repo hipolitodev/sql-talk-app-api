@@ -20,7 +20,6 @@ const functionDeclaration = {
 const functionAction = async ({ query }) => {
   try {
     const result = await pool.query(query);
-    const rows = result.rows
     return result.rows;
   } catch (error) {
     return error;

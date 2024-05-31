@@ -89,8 +89,8 @@ Please refer to the [API documentation](https://sql-talk-app-api.hipolito.dev/ap
 5. Authenticate on the socket sending a json like:
    ```
     {"type":"auth","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6I..."}'
-   ``` 
+   ```
 6. Send a message json like:
    ```
     {"chatId":"550cdd31-bbe6-4d5f-9293-75da740ef59b","content":"What kind of information is in this database?"}
-   ``` 
+   ```

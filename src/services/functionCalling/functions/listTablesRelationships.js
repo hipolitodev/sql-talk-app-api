@@ -1,14 +1,14 @@
 const pool = require('../../../configs/db.config');
 
 const functionDeclaration = {
-    name: 'list_relationships_between_tables',
-    description:
-        "Relationships Between Tables. To find relationships between tables, such as foreign key references.",
+  name: 'list_relationships_between_tables',
+  description:
+    'Relationships Between Tables. To find relationships between tables, such as foreign key references.',
 };
 
 const functionAction = async () => {
-    try {
-        const result = await pool.query(`
+  try {
+    const result = await pool.query(`
         SELECT 
         tc.table_schema, 
         tc.table_name, 
@@ -28,13 +28,13 @@ const functionAction = async () => {
         AND tc.table_name NOT IN ('internal_users', 'chats', 'messages', 'files');
         `);
 
-        return result.rows;
-    } catch (error) {
-        return error;
-    }
+    return result.rows;
+  } catch (error) {
+    return error;
+  }
 };
 
 module.exports = {
-    functionDeclaration,
-    functionAction,
+  functionDeclaration,
+  functionAction,
 };
