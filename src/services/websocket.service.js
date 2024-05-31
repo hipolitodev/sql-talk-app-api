@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const messages = require('../services/messages.service');
 const { startChat, sendPrompt } = require('../services/functionCalling/index');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 8080, path: '/api/chats' });
 console.log('Starting WebSocket server');
 
 wss.on('connection', (ws) => {

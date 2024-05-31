@@ -295,3 +295,34 @@ paths:
                       message:
                         type: string
                         example: 'An error occurred while creating the Message.'
+  /api/chats:
+    x-websocket:
+      summary: WebSocket Service
+      operationId: websocketService
+      tags:
+        - WebSocket
+      parameters:
+        - name: message
+          in: query
+          description: JSON message sent over the WebSocket connection
+          required: true
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                description: The type of the message. Can be 'auth' for authentication or a chat message.
+              token:
+                type: string
+                description: The JWT token for authentication. Required if type is 'auth'.
+              chatId:
+                type: string
+                description: The ID of the chat. Required if type is a chat message.
+              content:
+                type: string
+                description: The content of the chat message. Required if type is a chat message.
+      responses:
+        '200':
+          description: Successful connection
+        '1008':
+          description: Connection closed due to authentication error
