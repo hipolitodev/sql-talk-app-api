@@ -320,6 +320,13 @@ paths:
       tags:
         - Messages
       summary: Add message
+      parameters:
+        - name: chatId
+          in: path
+          description: The ID of the chat.
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
