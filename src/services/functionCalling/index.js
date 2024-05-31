@@ -9,14 +9,6 @@ const {
   sqlQuery,
 } = require('./functions');
 
-// const prompts = [
-//     "What kind of information is in this database?",
-//     "What percentage of orders are returned?",
-//     "How is inventory distributed across our regional distribution centers?",
-//     "Do customers typically place more than one order?",
-//     "Which product categories have the highest profit margins?",
-// ]
-
 const getEnhancedPrompt = (prompt) => {
   return `
 You are a data analyst at a large e-commerce company and you have access to their PostgreSQL database.
@@ -57,16 +49,16 @@ const parseMessage = (result) => {
 
   if (
     candidate?.content?.parts &&
-    Array.isArray(candidate.content.parts) &&
-    candidate.content.parts.length > 0
+    Array.isArray(candidate.content?.parts) &&
+    candidate.content?.parts.length > 0
   ) {
-    let isThereCall = candidate.content.parts
+    let isThereCall = candidate.content?.parts
       .map((part) => part.functionCall)
       .filter(Boolean);
     if (isThereCall.length > 0) {
       call = isThereCall[0];
     }
-    let isThereText = candidate.content.parts
+    let isThereText = candidate.content?.parts
       .map((part) => part.text)
       .filter(Boolean);
     if (isThereText.length > 0) {
@@ -95,13 +87,13 @@ const handleFunctionCall = async (call) => {
     case 'get_table_foreign_keys':
       apiResponse = await getTableForeignKeys.functionAction(params);
       break;
-    case 'list_all_columns_in_database':
+    case 'get_all_columns_in_database':
       apiResponse = await listAllColumns.functionAction(params);
       break;
-    case 'list_all_tables':
+    case 'get_all_tables':
       apiResponse = await listTables.functionAction(params);
       break;
-    case 'list_relationships_between_tables':
+    case 'get_relationships_between_tables':
       apiResponse = await listTablesRelationships.functionAction(params);
       break;
     case 'sql_query':
@@ -161,12 +153,15 @@ const processFunctionCalls = async ({
 
     apiRequestsAndResponses.push({ call, apiResponse, modelMessageParsed });
     if (modelMessageParsed.parts) {
-      ws.send(
-        JSON.stringify({
+      if (ws) {
+        ws.send(JSON.stringify({
           ...modelMessageData,
+          type: "log",
           content: modelMessageParsed.parts,
-        }),
-      );
+        }));
+      } else {
+        console.log(JSON.stringify({ modelUpdate: modelMessageParsed.parts }, null, 2));
+      }
     }
 
     if (modelMessageParsed.call) {
@@ -201,30 +196,24 @@ module.exports = {
   sendPrompt,
 };
 
-const test = async () => {
-  // const prompt = prompts[3];
-  const { chat } = await startChat();
+// const test = async () => {
+//   const { chat } = await startChat();
 
-  const initialPrompt = 'What kind of information is in this database?';
-  console.log(JSON.stringify({ initialPrompt }, null, 2));
-  const initialResponse = await sendPrompt({ chat, prompt: initialPrompt });
-  console.log(JSON.stringify({ initialResponse }, null, 2));
+//   const prompts = [
+//     // "What kind of information is in this database?", // TEST OK
+//     // "Give me the names of our distribution centers.", // TEST OK
+//     // "What percentage of orders are returned?", // TEST OK
+//     // "How is inventory distributed across our regional distribution centers?", // TEST OK
+//     // "How many products do we have?" //TEST OK
+//     // "Do customers typically place more than one order?", // Unable to process
+//     // "Which product categories have the highest profit margins?", // Unable to process
+//   ]
 
-  const followingPrompt = 'give me information about the orders table';
-  console.log(JSON.stringify({ followingPrompt }, null, 2));
-  const followingResponse = await sendPrompt({ chat, prompt: followingPrompt });
-  console.log(JSON.stringify({ followingResponse }, null, 2));
+//   for (const prompt of prompts) {
+//     console.log(JSON.stringify({ prompt }, null, 2));
+//     const promptResponse = await sendPrompt({ chat, prompt });
+//     console.log(JSON.stringify({ promptResponse }, null, 2));
+//   }
+// };
 
-  const followingPrompt2 = 'how many order did the user with id 67';
-  console.log(JSON.stringify({ followingPrompt2 }, null, 2));
-  const followingResponse2 = await sendPrompt({
-    chat,
-    prompt: followingPrompt2,
-  });
-  console.log(JSON.stringify({ followingResponse2 }, null, 2));
-};
-
-// JSON.stringify({
-//   chatId: '550cdd31-bbe6-4d5f-9293-75da740ef59b',
-//   content: 'What kind of information is in this database?',
-// });
+// test();

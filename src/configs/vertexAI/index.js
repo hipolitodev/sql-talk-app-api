@@ -19,9 +19,9 @@ const generateModel = async (tools) => {
       allowed_function_names: [
         'get_table_columns',
         'get_table_foreign_keys',
-        'list_all_columns_in_database',
-        'list_all_tables',
-        'list_relationships_between_tables',
+        'get_all_columns_in_database',
+        'get_all_tables',
+        'get_relationships_between_tables',
         'sql_query',
       ],
     },
