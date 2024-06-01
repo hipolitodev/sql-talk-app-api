@@ -1,7 +1,7 @@
 const pool = require('../../../configs/db.config');
 const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 
-const functionDeclaration = {
+const declaration = {
   name: 'sql_query',
   description: 'Get information from tables in PostgreSQL using SQL queries',
   parameters: {
@@ -17,7 +17,7 @@ const functionDeclaration = {
   },
 };
 
-const functionAction = async ({ query }) => {
+const action = async ({ query }) => {
   try {
     const result = await pool.query(query);
     return result.rows;
@@ -27,6 +27,6 @@ const functionAction = async ({ query }) => {
 };
 
 module.exports = {
-  functionDeclaration,
-  functionAction,
+  declaration,
+  action,
 };

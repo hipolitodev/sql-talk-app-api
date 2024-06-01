@@ -1,7 +1,7 @@
 const pool = require('../../../configs/db.config');
 const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 
-const functionDeclaration = {
+const declaration = {
   name: 'get_table_columns',
   description:
     'Get Columns for a Specific Table, To get information about the columns of a specific table.',
@@ -17,7 +17,7 @@ const functionDeclaration = {
   },
 };
 
-const functionAction = async ({ table_id }) => {
+const action = async ({ table_id }) => {
   try {
     const columnQuery = `
             SELECT 
@@ -39,6 +39,6 @@ const functionAction = async ({ table_id }) => {
 };
 
 module.exports = {
-  functionDeclaration,
-  functionAction,
+  declaration,
+  action,
 };

@@ -130,10 +130,8 @@ const createSocketServer = (server) => {
       ws.send(
         JSON.stringify({
           isFinal: true,
-          chatId,
           sender: 'MODEL',
           content: modelResponse,
-          timestamp,
         }),
       );
     } catch (error) {

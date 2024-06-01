@@ -1,12 +1,12 @@
 const pool = require('../../../configs/db.config');
 
-const functionDeclaration = {
+const declaration = {
   name: 'get_relationships_between_tables',
   description:
     'Relationships Between Tables. To find relationships between tables, such as foreign key references.',
 };
 
-const functionAction = async () => {
+const action = async () => {
   try {
     const result = await pool.query(`
         SELECT 
@@ -35,6 +35,6 @@ const functionAction = async () => {
 };
 
 module.exports = {
-  functionDeclaration,
-  functionAction,
+  declaration,
+  action,
 };

@@ -1,13 +1,7 @@
 require('dotenv').config();
-const generateModel = require('../../../src/configs/vertexAI');
-const {
-  getTable,
-  getTableForeignKeys,
-  listAllColumns,
-  listTables,
-  listTablesRelationships,
-  sqlQuery,
-} = require('./functions');
+
+const vertexAI = require('../../../src/configs/vertexAI');
+const { functions, functionNames, functionDeclarations } = require('./functions');
 const messages = require('../messages.service');
 
 const getEnhancedPrompt = (prompt) => {
@@ -24,179 +18,119 @@ ${prompt}
 };
 
 const startChat = async () => {
-  const function_declarations = [
-    {
-      functionDeclarations: [
-        getTable.functionDeclaration,
-        getTableForeignKeys.functionDeclaration,
-        listAllColumns.functionDeclaration,
-        listTables.functionDeclaration,
-        listTablesRelationships.functionDeclaration,
-        sqlQuery.functionDeclaration,
-      ],
-    },
-  ];
-
-  const model = await generateModel([function_declarations]);
+  const tools = [{ functionDeclarations }];
+  const model = await vertexAI.generateModel(tools, functionNames);
   const chat = await model.startChat();
 
   return { chat };
 };
 
-const parseMessage = (result) => {
-  let parts = [];
-  const candidate = result?.response?.candidates[0];
-  let call;
+const parseModelResponse = (result) => {
+  const candidate = result?.response?.candidates?.[0];
+  const parts = candidate?.content?.parts;
+  let call, text;
 
-  if (
-    candidate?.content?.parts &&
-    Array.isArray(candidate.content?.parts) &&
-    candidate.content?.parts.length > 0
-  ) {
-    let isThereCall = candidate.content?.parts
-      .map((part) => part.functionCall)
-      .filter(Boolean);
-    if (isThereCall.length > 0) {
-      call = isThereCall[0];
-    }
-    let isThereText = candidate.content?.parts
-      .map((part) => part.text)
-      .filter(Boolean);
-    if (isThereText.length > 0) {
-      parts = isThereText;
-    }
-  }
-  if (!call) {
-    parts = candidate?.content?.parts;
+  if (Array.isArray(parts)) {
+    call = parts.find(part => Boolean(part.functionCall))?.functionCall;
+    text = parts.find(part => Boolean(part.text))?.text;
   }
 
-  return { call, parts };
-};
+  return { call, text };
+}
 
 const handleFunctionCall = async (call) => {
-  let apiResponse;
+  const functionAction = functions.find((f) => f.declaration.name === call.name);
+  if (!functionAction) return;
 
-  const params = {};
-  for (const [key, value] of Object.entries(call?.args)) {
-    params[key] = value;
-  }
+  const params = Object.assign({}, call.args);
+  const content = await functionAction.action(params);
 
-  switch (call.name) {
-    case 'get_table_columns':
-      apiResponse = await getTable.functionAction(params);
-      break;
-    case 'get_table_foreign_keys':
-      apiResponse = await getTableForeignKeys.functionAction(params);
-      break;
-    case 'get_all_columns_in_database':
-      apiResponse = await listAllColumns.functionAction(params);
-      break;
-    case 'get_all_tables':
-      apiResponse = await listTables.functionAction(params);
-      break;
-    case 'get_relationships_between_tables':
-      apiResponse = await listTablesRelationships.functionAction(params);
-      break;
-    case 'sql_query':
-      apiResponse = await sqlQuery.functionAction(params);
-      break;
-    default:
-      break;
-  }
-
-  return apiResponse;
+  return {
+    name: call.name,
+    response: { content },
+  };
 };
+
+const delayModelUsage = async (startTime, callCount) => {
+  callCount++
+  const maxTime = 61000;
+  const maxCalls = 5;
+
+  if (callCount > maxCalls) {
+    let endTime = Date.now();
+    let elapsedTime = endTime - startTime;
+
+    if (elapsedTime < maxTime) {
+      let delay = maxTime - elapsedTime;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+
+    return { callCount: 0, startTime: Date.now() };
+  }
+
+  return { callCount, startTime };
+}
+
+const streamResponse = async (websocketData, text) => {
+  if (text) {
+    if (websocketData?.ws) {
+      ws.send(JSON.stringify({
+        ...modelMessageData,
+        type: "websocketData",
+        content: text,
+      }));
+    } else {
+      console.log(JSON.stringify({ modelUpdate: text }, null, 2));
+    }
+  }
+}
 
 const processFunctionCalls = async ({
-  initialCall,
+  call,
   chat,
-  ws,
-  modelMessageData,
+  websocketData,
 }) => {
-  let call = initialCall;
-  let response;
-  let functionCallingInProcess = true;
+  let data = { call, text: "" }
+  let delayData = { startTime: Date.now(), callCount: 0 }
   const apiRequestsAndResponses = [];
+  let response;
 
-  let startTime = Date.now();
-  let callCount = 0;
+  do {
+    delayData = await delayModelUsage(delayData.startTime, delayData.callCount); // Model limits 5 calls per minute, comment this line to disable
 
-  while (functionCallingInProcess) {
-    callCount++;
-    if (callCount > 5) {
-      let endTime = Date.now();
-      let elapsedTime = endTime - startTime;
+    const functionResponse = await handleFunctionCall(call);
+    const modelResponse = await chat.sendMessage([{ functionResponse }]);
 
-      if (elapsedTime < 60000) {
-        let delay = 60000 - elapsedTime;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
+    const responses = { api: { ...call, ...functionResponse }, model: modelResponse }
+    apiRequestsAndResponses.push(responses);
+    data = parseModelResponse(modelResponse);
 
-      startTime = Date.now();
-      callCount = 0;
-    }
+    response = data.text;
+    call = data.call;
 
-    const apiResponse = await handleFunctionCall(call);
-
-    await new Promise((resolve) => setTimeout(resolve, 12000));
-    const modelMessage = await chat.sendMessage([
-      {
-        functionResponse: {
-          name: call.name,
-          response: {
-            content: apiResponse,
-          },
-        },
-      },
-    ]);
-
-    const modelMessageParsed = parseMessage(modelMessage);
-
-    apiRequestsAndResponses.push({ call, apiResponse, modelMessageParsed });
-    if (modelMessageParsed.parts) {
-      if (ws) {
-        ws.send(JSON.stringify({
-          ...modelMessageData,
-          type: "log",
-          content: modelMessageParsed.parts,
-        }));
-      } else {
-        console.log(JSON.stringify({ modelUpdate: modelMessageParsed.parts }, null, 2));
-      }
-    }
-
-    if (modelMessageParsed.call) {
-      call = modelMessageParsed.call;
-    } else {
-      functionCallingInProcess = false;
-      response = modelMessageParsed.parts;
-    }
-  }
+    if (call) streamResponse(websocketData, data.text)
+  } while (call);
 
   return { response, apiRequestsAndResponses };
 };
 
-const sendPrompt = async ({ chat, prompt, ws, modelMessageData }) => {
+const sendPrompt = async ({ chat, prompt, websocketData }) => {
   const enhancedPrompt = getEnhancedPrompt(prompt);
-  const messageResponse = await chat.sendMessage(enhancedPrompt);
-  const { call, parts } = parseMessage(messageResponse);
-  if (!call) return parts;
+  const modelResponse = await chat.sendMessage(enhancedPrompt);
+  const { call, text } = parseModelResponse(modelResponse);
 
-  const { response, apiRequestsAndResponses } = await processFunctionCalls({
-    initialCall: call,
-    chat,
-    ws,
-    modelMessageData
-  });
+  if (text) streamResponse(websocketData, text)
 
-  const messageDataModel = {
-    ...modelMessageData,
-    content: { response, apiRequestsAndResponses },
-  };
+  const content = call
+    ? await processFunctionCalls({ call, chat, websocketData })
+    : { model: modelResponse };
 
-  await messages.create(messageDataModel);
+  // await messages.create({
+  //   ...websocketData.modelMessageData,
+  //   content,
+  // });
 
-  return { response, apiRequestsAndResponses };
+  return content;
 };
 
 module.exports = {
@@ -204,24 +138,26 @@ module.exports = {
   sendPrompt,
 };
 
-// const test = async () => {
-//   const { chat } = await startChat();
+const test = async () => {
+  const { chat } = await startChat();
 
-//   const prompts = [
-//     // "What kind of information is in this database?", // TEST OK
-//     // "Give me the names of our distribution centers.", // TEST OK
-//     // "What percentage of orders are returned?", // TEST OK
-//     // "How is inventory distributed across our regional distribution centers?", // TEST OK
-//     // "How many products do we have?" //TEST OK
-//     // "Do customers typically place more than one order?", // Unable to process
-//     // "Which product categories have the highest profit margins?", // Unable to process
-//   ]
+  const prompts = [
+    "What kind of information is in this database?", // TEST OK
+    "Give me the names of our distribution centers.", // TEST OK
+    // "What percentage of orders are returned?", // TEST OK
+    // "How is inventory distributed across our regional distribution centers?", // TEST OK
+    // "How many products do we have?" //TEST OK
+    // "Do customers typically place more than one order?", // Unable to process
+    // "Which product categories have the highest profit margins?", // Unable to process
+  ]
 
-//   for (const prompt of prompts) {
-//     console.log(JSON.stringify({ prompt }, null, 2));
-//     const promptResponse = await sendPrompt({ chat, prompt });
-//     console.log(JSON.stringify({ promptResponse }, null, 2));
-//   }
-// };
+  for (const prompt of prompts) {
+    console.log(JSON.stringify({ prompt }, null, 2));
+    const { response } = await sendPrompt({ chat, prompt });
+    console.log(JSON.stringify({ response }, null, 2));
+    // wait for 1 minute
+    await new Promise((resolve) => setTimeout(resolve, 60000));
+  }
+};
 
-// test();
+test();

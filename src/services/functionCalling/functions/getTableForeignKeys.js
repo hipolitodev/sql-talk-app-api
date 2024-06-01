@@ -1,7 +1,7 @@
 const pool = require('../../../configs/db.config');
 const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 
-const functionDeclaration = {
+const declaration = {
   name: 'get_table_foreign_keys',
   description:
     'Get Foreign Keys of a Table. To find the foreign keys in a specific table.',
@@ -17,7 +17,7 @@ const functionDeclaration = {
   },
 };
 
-const functionAction = async ({ table_id }) => {
+const action = async ({ table_id }) => {
   try {
     const columnQuery = `
           SELECT kcu.column_name, ccu.table_name AS foreign_table_name, ccu.column_name AS foreign_column_name
@@ -37,6 +37,6 @@ const functionAction = async ({ table_id }) => {
 };
 
 module.exports = {
-  functionDeclaration,
-  functionAction,
+  declaration,
+  action,
 };

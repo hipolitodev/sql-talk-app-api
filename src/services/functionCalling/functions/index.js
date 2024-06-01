@@ -5,11 +5,20 @@ const listTables = require('./listTables');
 const listTablesRelationships = require('./listTablesRelationships');
 const sqlQuery = require('./sqlQuery');
 
-module.exports = {
+const functions = [
   getTable,
   getTableForeignKeys,
   listAllColumns,
   listTables,
   listTablesRelationships,
   sqlQuery,
-};
+];
+
+const functionNames = functions.map((f) => f.declaration.name);
+const functionDeclarations = functionNames.map(name => ([functions.find((f) => f.declaration.name === name).declaration]));
+
+module.exports = {
+  functions,
+  functionNames,
+  functionDeclarations
+}

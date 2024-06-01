@@ -1,11 +1,11 @@
 const pool = require('../../../configs/db.config');
 
-const functionDeclaration = {
+const declaration = {
   name: 'get_all_tables',
   description: 'To get a list of all tables in the database.',
 };
 
-const functionAction = async () => {
+const action = async () => {
   try {
     const result = await pool.query(`
           SELECT table_name
@@ -23,6 +23,6 @@ const functionAction = async () => {
 };
 
 module.exports = {
-  functionDeclaration,
-  functionAction,
+  declaration,
+  action,
 };
