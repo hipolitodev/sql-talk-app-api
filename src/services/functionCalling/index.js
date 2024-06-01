@@ -6,11 +6,11 @@ const messages = require('../messages.service');
 
 const getEnhancedPrompt = (prompt) => {
   return `
-You are a data analyst at a large e-commerce company and you have access to their PostgreSQL database.
+You are a data engineer at a large e-commerce company and your job is to analyze the PostgreSQL database.
 When asked a question, don't make assumptions about the data, only use the information you learn from the database.
 You can ask questions about the database structure, list all the tables, list all columns in the database, list relationships between tables and make SQL queries.
 
-Before crafting your own query make sure all the fields that you are using exists, do not guess o make assumptions about them.
+Before crafting your own query make sure all the fields that you are using exist, do not guess o make assumptions about them.
 In case of error try again. If you need additional information, ask for it.
 
 ${prompt}
@@ -46,9 +46,18 @@ const handleFunctionCall = async (call) => {
   const content = await functionAction.action(params);
 
   return {
-    name: call.name,
-    response: { content },
-  };
+    role: 'function',
+    parts: [
+      {
+        functionResponse: {
+          name: call.name,
+          response: {
+            content
+          }
+        }
+      }
+    ],
+  }
 };
 
 const delayModelUsage = async (startTime, callCount) => {
@@ -139,25 +148,80 @@ module.exports = {
 };
 
 const test = async () => {
-  const { chat } = await startChat();
+  const prompt = "What percentage of orders are returned?"
+  const enhancedPrompt = getEnhancedPrompt(prompt);
 
-  const prompts = [
-    "What kind of information is in this database?", // TEST OK
-    "Give me the names of our distribution centers.", // TEST OK
-    // "What percentage of orders are returned?", // TEST OK
-    // "How is inventory distributed across our regional distribution centers?", // TEST OK
-    // "How many products do we have?" //TEST OK
-    // "Do customers typically place more than one order?", // Unable to process
-    // "Which product categories have the highest profit margins?", // Unable to process
+  const contents = [
+    {
+      parts: [
+        { text: enhancedPrompt }
+      ],
+      role: 'user'
+    }
   ]
 
-  for (const prompt of prompts) {
-    console.log(JSON.stringify({ prompt }, null, 2));
-    const { response } = await sendPrompt({ chat, prompt });
-    console.log(JSON.stringify({ response }, null, 2));
-    // wait for 1 minute
+  const tools = [{ functionDeclarations }];
+  const model = await vertexAI.generateModel(tools, functionNames);
+
+  let call = null;
+  do {
+    const { response } = await model.generateContent({ contents, tools });
+    const { content } = response?.candidates?.[0];
+
+    contents.push(content);
+    console.log(JSON.stringify({ content }, null, 2));
+
+    call = content?.parts.find(part => Boolean(part.functionCall))?.functionCall;
+
+    if (call) {
+      const functionContent = await handleFunctionCall(call);
+      contents.push(functionContent);
+      console.log(JSON.stringify({ functionContent }, null, 2));
+    }
+
+    // wait a minute
     await new Promise((resolve) => setTimeout(resolve, 60000));
-  }
+  } while (call);
+  console.log(JSON.stringify({ contents }, null, 2));
+  // const prompts = [
+  //   "What kind of information is in this database?", // TEST OK
+  //   "Give me the names of our distribution centers.", // TEST OK
+  //   // "What percentage of orders are returned?", // TEST OK
+  //   // "How is inventory distributed across our regional distribution centers?", // TEST OK
+  //   // "How many products do we have?" //TEST OK
+  //   // "Do customers typically place more than one order?", // Unable to process
+  //   // "Which product categories have the highest profit margins?", // Unable to process
+  // ]
+
+  // for (const prompt of prompts) {
+  //   console.log(JSON.stringify({ prompt }, null, 2));
+  //   const { response } = await sendPrompt({ chat, prompt });
+  //   console.log(JSON.stringify({ response }, null, 2));
+  //   // wait for 1 minute
+  //   await new Promise((resolve) => setTimeout(resolve, 60000));
+  // }
 };
+
+// const test = async () => {
+//   const { chat } = await startChat();
+
+//   const prompts = [
+//     "What kind of information is in this database?", // TEST OK
+//     "Give me the names of our distribution centers.", // TEST OK
+//     // "What percentage of orders are returned?", // TEST OK
+//     // "How is inventory distributed across our regional distribution centers?", // TEST OK
+//     // "How many products do we have?" //TEST OK
+//     // "Do customers typically place more than one order?", // Unable to process
+//     // "Which product categories have the highest profit margins?", // Unable to process
+//   ]
+
+//   for (const prompt of prompts) {
+//     console.log(JSON.stringify({ prompt }, null, 2));
+//     const { response } = await sendPrompt({ chat, prompt });
+//     console.log(JSON.stringify({ response }, null, 2));
+//     // wait for 1 minute
+//     await new Promise((resolve) => setTimeout(resolve, 60000));
+//   }
+// };
 
 test();

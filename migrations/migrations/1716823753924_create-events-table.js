@@ -28,6 +28,8 @@ exports.up = (pgm) => {
     traffic_source: { type: 'string', notNull: false },
     uri: { type: 'string', notNull: false },
     event_type: { type: 'string', notNull: false },
+  }, {
+    comment: 'Programatically generated web events for The Look fictitious e-commerce store'
   });
 };
 

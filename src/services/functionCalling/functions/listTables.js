@@ -1,7 +1,7 @@
 const pool = require('../../../configs/db.config');
 
 const declaration = {
-  name: 'get_all_tables',
+  name: 'list_tables',
   description: 'To get a list of all tables in the database.',
 };
 
@@ -16,7 +16,7 @@ const action = async () => {
           AND table_name NOT IN ('internal_users', 'chats', 'messages', 'files');
         `);
 
-    return result.rows;
+    return result.rows.map((row) => row.table_name);
   } catch (error) {
     return error;
   }

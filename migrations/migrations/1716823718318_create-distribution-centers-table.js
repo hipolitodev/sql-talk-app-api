@@ -14,6 +14,8 @@ exports.up = (pgm) => {
     name: { type: 'string', notNull: false },
     latitude: { type: 'float', notNull: false },
     longitude: { type: 'float', notNull: false },
+  }, {
+    comment: 'The Look fictitious e-commerce dataset: distribution_centers table'
   });
 };
 

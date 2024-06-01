@@ -29,6 +29,8 @@ exports.up = (pgm) => {
       notNull: false,
       default: pgm.func('current_timestamp'),
     },
+  }, {
+    comment: 'Programatically generated users for The Look fictitious e-commerce store'
   });
 };
 

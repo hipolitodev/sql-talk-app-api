@@ -14,7 +14,6 @@ const {
 } = require('./src/middlewares/validatePremiumUser.middleware');
 const { logger } = require('./src/middlewares/logger.middleware');
 const loggerUtil = require('./src/utils/logger.util');
-// eslint-disable-next-line no-unused-vars
 const { createSocketServer } = require('./src/services/websocket.service');
 
 const app = express();
@@ -24,7 +23,7 @@ const authRouter = require('./src/routes/auth.route');
 const usersRouter = require('./src/routes/users.route');
 const chatsRouter = require('./src/routes/chats.route');
 const messagesRouter = require('./src/routes/messages.route');
-const swaggerDocument = YAML.load('./src/configs/docs.config.yaml');
+const swaggerDocument = YAML.load('./docs/swagger.docs.yaml');
 
 app.use(cors());
 app.use(logger);
@@ -40,18 +39,17 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api', authRouter);
 app.use('/api', usersRouter);
 
-// Protected routes
+// Middlewares
 app.use('/api', authenticateToken);
 app.use('/api', validatePremiumUser);
 
+// Protected routes
 app.use('/api', chatsRouter);
 app.use('/api', messagesRouter);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Create an HTTP server
 const server = http.createServer(app);
-
 createSocketServer(server);
 
 server.listen(PORT, () => {

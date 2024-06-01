@@ -16,17 +16,16 @@ const vertex_ai = new VertexAI({
 });
 
 const generateModel = (tools, functionNames) => {
-  return vertex_ai.preview.getGenerativeModel({
+  return vertex_ai.getGenerativeModel({
     model: MODEL_NAME,
     generationConfig: {
-      maxOutputTokens: MAX_OUTPUT_TOKENS,
       temperature: TEMPERATURE,
     },
     tools,
-    function_calling_config: {
-      mode: 'ANY',
-      allowed_function_names: functionNames,
-    },
+    // function_calling_config: {
+    //   mode: 'ANY',
+    //   allowed_function_names: functionNames,
+    // },
   });
 };
 

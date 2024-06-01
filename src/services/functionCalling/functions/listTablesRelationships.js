@@ -1,7 +1,7 @@
 const pool = require('../../../configs/db.config');
 
 const declaration = {
-  name: 'get_relationships_between_tables',
+  name: 'list_relationships_between_tables',
   description:
     'Relationships Between Tables. To find relationships between tables, such as foreign key references.',
 };

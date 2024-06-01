@@ -24,6 +24,8 @@ exports.up = (pgm) => {
       references: '"distribution_centers"',
       onDelete: 'cascade',
     },
+  }, {
+    comment: 'The Look fictitious e-commerce dataset - products table'
   });
 };
 

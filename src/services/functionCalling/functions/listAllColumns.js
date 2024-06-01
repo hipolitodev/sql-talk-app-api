@@ -2,7 +2,7 @@ const pool = require('../../../configs/db.config');
 const { FunctionDeclarationSchemaType } = require('@google-cloud/vertexai');
 
 const declaration = {
-  name: 'get_all_columns_in_database',
+  name: 'list_all_columns_in_database',
   description:
     'Get All Columns in the Database. To get a comprehensive list of all columns in all tables in the database.',
   parameters: {

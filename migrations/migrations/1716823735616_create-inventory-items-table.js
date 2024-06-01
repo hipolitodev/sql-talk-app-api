@@ -32,6 +32,8 @@ exports.up = (pgm) => {
       references: 'distribution_centers',
       onDelete: 'SET NULL',
     },
+  }, {
+    comment: 'Programatically generated inventory for The Look fictitious e-commerce store'
   });
 };
 

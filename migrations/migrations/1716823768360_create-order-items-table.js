@@ -41,6 +41,8 @@ exports.up = (pgm) => {
     delivered_at: { type: 'timestamp', notNull: false },
     returned_at: { type: 'timestamp', notNull: false },
     sale_price: { type: 'float', notNull: false },
+  }, {
+    comment: 'Programatically generated order items for The Look fictitious e-commerce store'
   });
 };
 
