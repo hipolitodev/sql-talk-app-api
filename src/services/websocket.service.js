@@ -1,7 +1,8 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const messages = require('../services/messages.service');
-const { startChat, sendPrompt } = require('../services/functionCalling/index');
+const functionCallingChat = require('../services/functionCalling/index');
+const functionCallingGC = require('../services/functionCalling/generateContent');
 const logger = require('../utils/logger.util');
 
 const createSocketServer = (server) => {
@@ -11,9 +12,11 @@ const createSocketServer = (server) => {
   wss.on('connection', (ws) => {
     logger.info('A new client connected');
 
-    ws.on('message', async (message) => {
+    const validateMessage = async (message) => {
+      const UnableToReadMessage = 'Unable to read message';
+
       if (!message) {
-        logger.info('Received undefined message');
+        ws.send(JSON.stringify({ error: UnableToReadMessage }));
         return;
       }
 
@@ -21,124 +24,127 @@ const createSocketServer = (server) => {
       try {
         data = JSON.parse(message);
       } catch (err) {
-        logger.info('Failed to parse message:', err);
+        ws.send(JSON.stringify({ error: UnableToReadMessage }));
         return;
       }
 
-      if (!!data.token) {
-        const token = data.token;
-        if (!token) {
-          ws.send(
-            JSON.stringify({
-              type: 'auth',
-              success: false,
-              message: 'Token is required',
-            }),
-          );
-          ws.close(1008, 'Token is required');
-          return;
+      if (!data.content) {
+        ws.send(JSON.stringify({ error: UnableToReadMessage }));
+        return;
+      }
+
+      // await validateToken(data);
+
+      return data;
+    }
+
+    const verifyToken = (token) => {
+      const secret = process.env.JWT_SECRET;
+      return new Promise((resolve, reject) => {
+        jwt.verify(token, secret, (err, user) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(user);
+          }
+        });
+      });
+    };
+
+    const validateToken = async ({ token }) => {
+      if (!token) {
+        ws.send(
+          JSON.stringify({
+            type: 'auth',
+            success: false,
+            message: 'Token is required',
+          }),
+        );
+        return;
+      }
+
+      try {
+        const user = await verifyToken(token);
+        ws.user = user;
+        logger.info(`User ${user.id} authenticated successfully`);
+      } catch (err) {
+        ws.send(
+          JSON.stringify({
+            type: 'auth',
+            success: false,
+            message: 'Invalid token',
+          }),
+        );
+      }
+    }
+
+    const handleIncomingMessage = async (ws, { chatId, content, useChat = false }) => {
+      try {
+        if (!!chatId) {
+          await messages.create({
+            chat_id: chatId,
+            user_id: ws.user.id,
+            sender: 'USER',
+            content: content,
+          });
         }
 
-        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-          if (err) {
-            ws.send(
-              JSON.stringify({
-                type: 'auth',
-                success: false,
-                message: 'Invalid token',
-              }),
-            );
-            ws.close(1008, 'Invalid token');
-            return;
+        const websocketData = {
+          ws,
+          chatData: {
+            chat_id: chatId,
+            user_id: ws?.user?.id,
+          },
+        };
+
+        let modelResponse;
+        try {
+          if (useChat) {
+            if (!ws.chat) {
+              const { chat } = await functionCallingChat.startChat();
+              ws.chat = chat;
+            }
+
+            modelResponse = await functionCallingChat.sendPrompt({
+              chat: ws.chat,
+              prompt: content,
+              websocketData
+            }, !!chatId);
+          } else {
+            modelResponse = await functionCallingGC.generateContent({
+              prompt: content,
+              websocketData,
+            }, !!chatId);
           }
 
-          ws.user = user;
-          handleIncomingMessage(ws, data);
-          logger.info(`User ${user.id} authenticated successfully`);
-        });
-      } else {
-        ws.send(JSON.stringify({ error: 'Authentication required' }));
+          ws.send(
+            JSON.stringify({
+              sender: 'MODEL',
+              content: modelResponse,
+            }),
+          );
+        } catch (error) {
+          if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
+            logger.info('WebSocket connection closed, but sendPrompt will continue running.');
+          } else {
+            throw error;
+          }
+        }
+      } catch (error) {
+        logger.info(error);
+        ws.send(JSON.stringify({ message: 'Failed to process message', error }));
       }
+    };
+
+    ws.on('message', async (message) => {
+      const validatedMessage = await validateMessage(message);
+      handleIncomingMessage(ws, validatedMessage);
     });
 
     ws.on('close', () => {
       logger.info('Client disconnected');
     });
   });
-
-  const handleIncomingMessage = async (ws, message) => {
-    try {
-      const { chatId, content, dontSave } = message;
-
-      if (!chatId || !content) {
-        ws.send(JSON.stringify({ error: 'Invalid message format' }));
-        return;
-      }
-
-      if (!ws.chats) {
-        ws.chats = {};
-      }
-
-      if (!ws.chats[chatId]) {
-        ws.chats[chatId] = [];
-      }
-
-      if (!ws.chat) {
-        const { chat } = await startChat();
-        ws.chat = chat;
-      }
-
-      const timestamp = new Date().toISOString();
-
-      ws.chats[chatId].push({ sender: ws.user.id, content, timestamp });
-
-      if (!dontSave) {
-        const messageData = {
-          chat_id: chatId,
-          user_id: ws.user.id,
-          sender: 'USER',
-          content: content,
-        };
-        await messages.create(messageData);
-      }
-
-      let modelResponse;
-      try {
-        modelResponse = await sendPrompt({
-          chat: ws.chat,
-          prompt: content,
-          ws,
-          modelMessageData: {
-            chat_id: chatId,
-            user_id: ws.user.id,
-            sender: 'MODEL',
-          },
-        });
-      } catch (error) {
-        if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
-          console.log('WebSocket connection closed, but sendPrompt will continue running.');
-        } else {
-          throw error;
-        }
-      }
-
-      ws.chats[chatId].push({
-        sender: 'MODEL',
-        content: modelResponse,
-        timestamp,
-      });
-      ws.send(
-        JSON.stringify({
-          isFinal: true,
-          sender: 'MODEL',
-          content: modelResponse,
-        }),
-      );
-    } catch (error) {
-      logger.info(error);
-      ws.send(JSON.stringify({ message: 'Failed to process message', error }));
-    }
-  };
 
   return wss
 }

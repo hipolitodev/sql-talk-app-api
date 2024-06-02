@@ -1,17 +1,17 @@
+const listTables = require('./listTables');
 const getTable = require('./getTable');
+const sqlQuery = require('./sqlQuery');
 const getTableForeignKeys = require('./getTableForeignKeys');
 const listAllColumns = require('./listAllColumns');
-const listTables = require('./listTables');
 const listTablesRelationships = require('./listTablesRelationships');
-const sqlQuery = require('./sqlQuery');
 
 const functions = [
-  getTable,
-  getTableForeignKeys,
-  listAllColumns,
   listTables,
-  listTablesRelationships,
+  getTable,
   sqlQuery,
+  // getTableForeignKeys,
+  // listAllColumns,
+  // listTablesRelationships,
 ];
 
 const functionNames = functions.map((f) => f.declaration.name);

@@ -84,7 +84,7 @@ const streamResponse = async (websocketData, text) => {
   if (text) {
     if (websocketData?.ws) {
       ws.send(JSON.stringify({
-        ...modelMessageData,
+        ...chatData,
         type: "websocketData",
         content: text,
       }));
@@ -135,7 +135,7 @@ const sendPrompt = async ({ chat, prompt, websocketData }) => {
     : { model: modelResponse };
 
   // await messages.create({
-  //   ...websocketData.modelMessageData,
+  //   ...websocketData.chatData,
   //   content,
   // });
 
@@ -145,61 +145,6 @@ const sendPrompt = async ({ chat, prompt, websocketData }) => {
 module.exports = {
   startChat,
   sendPrompt,
-};
-
-const test = async () => {
-  const prompt = "What percentage of orders are returned?"
-  const enhancedPrompt = getEnhancedPrompt(prompt);
-
-  const contents = [
-    {
-      parts: [
-        { text: enhancedPrompt }
-      ],
-      role: 'user'
-    }
-  ]
-
-  const tools = [{ functionDeclarations }];
-  const model = await vertexAI.generateModel(tools, functionNames);
-
-  let call = null;
-  do {
-    const { response } = await model.generateContent({ contents, tools });
-    const { content } = response?.candidates?.[0];
-
-    contents.push(content);
-    console.log(JSON.stringify({ content }, null, 2));
-
-    call = content?.parts.find(part => Boolean(part.functionCall))?.functionCall;
-
-    if (call) {
-      const functionContent = await handleFunctionCall(call);
-      contents.push(functionContent);
-      console.log(JSON.stringify({ functionContent }, null, 2));
-    }
-
-    // wait a minute
-    await new Promise((resolve) => setTimeout(resolve, 60000));
-  } while (call);
-  console.log(JSON.stringify({ contents }, null, 2));
-  // const prompts = [
-  //   "What kind of information is in this database?", // TEST OK
-  //   "Give me the names of our distribution centers.", // TEST OK
-  //   // "What percentage of orders are returned?", // TEST OK
-  //   // "How is inventory distributed across our regional distribution centers?", // TEST OK
-  //   // "How many products do we have?" //TEST OK
-  //   // "Do customers typically place more than one order?", // Unable to process
-  //   // "Which product categories have the highest profit margins?", // Unable to process
-  // ]
-
-  // for (const prompt of prompts) {
-  //   console.log(JSON.stringify({ prompt }, null, 2));
-  //   const { response } = await sendPrompt({ chat, prompt });
-  //   console.log(JSON.stringify({ response }, null, 2));
-  //   // wait for 1 minute
-  //   await new Promise((resolve) => setTimeout(resolve, 60000));
-  // }
 };
 
 // const test = async () => {
@@ -223,5 +168,4 @@ const test = async () => {
 //     await new Promise((resolve) => setTimeout(resolve, 60000));
 //   }
 // };
-
-test();
+JSON.stringify({ content: 'What kind of information is in this database' })

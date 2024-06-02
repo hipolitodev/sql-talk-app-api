@@ -53,5 +53,5 @@ const server = http.createServer(app);
 createSocketServer(server);
 
 server.listen(PORT, () => {
-  loggerUtil.info(`Server is running on http://localhost:${PORT}...`);
+  loggerUtil.info(`Server is running on port: ${PORT}...`);
 });
