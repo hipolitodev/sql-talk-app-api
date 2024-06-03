@@ -211,6 +211,8 @@ paths:
       tags:
         - Chats
       summary: List chats
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Chats retrieved successfully.
@@ -363,6 +365,8 @@ paths:
       tags:
         - Messages
       summary: List messages
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Messages retrieved successfully.
