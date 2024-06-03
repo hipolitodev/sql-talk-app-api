@@ -1,56 +1,15 @@
 require('dotenv').config();
 
-const vertexAI = require('../../configs/vertexAI');
-const { functions, functionNames, functionDeclarations } = require('./functions');
 const messages = require('../messages.service');
-const delay = require('../../utils/functionCalling/delay.util');
-const getEnhancedPrompt = require('../../utils/functionCalling/getEnhancedPrompt.util');
-
-const getUserContent = (prompt) => {
-    const enhancedPrompt = getEnhancedPrompt(prompt);
-
-    return {
-        parts: [
-            { text: enhancedPrompt }
-        ],
-        role: 'user'
-    }
-}
+const { generateModel } = require('../../configs/vertexAI');
+const { functionNames, functionDeclarations, handleFunctionCall } = require('./functions');
+const { delay, getUserContent, streamResponse } = require('../../utils/functionCalling');
 
 const getModel = async () => {
     const tools = [{ functionDeclarations }];
-    const model = await vertexAI.generateModel(tools, functionNames);
+    const model = await generateModel(tools, functionNames);
 
     return { model, tools };
-};
-
-const streamResponse = async (content, websocketData) => {
-    websocketData?.ws?.send(JSON.stringify({
-        sender: 'MODEL_LOGS',
-        content,
-    }));
-}
-
-const handleFunctionCall = async (call) => {
-    const functionAction = functions.find((f) => f.declaration.name === call.name);
-    if (!functionAction) return;
-
-    const params = Object.assign({}, call.args);
-    const content = await functionAction.action(params);
-
-    return {
-        role: 'function',
-        parts: [
-            {
-                functionResponse: {
-                    name: call.name,
-                    response: {
-                        content
-                    }
-                }
-            }
-        ],
-    }
 };
 
 const processPrompt = async ({
@@ -60,6 +19,7 @@ const processPrompt = async ({
     websocketData,
 }) => {
     let call = null;
+    let tokenCount = 0;
 
     let modelDelay = {
         startTime: Date.now(),
@@ -71,6 +31,7 @@ const processPrompt = async ({
     do {
         const { response } = await model.generateContent({ contents, tools });
         const modelContent = response?.candidates?.[0]?.content;
+        tokenCount += response?.usageMetadata?.totalTokenCount;
 
         contents.push(modelContent);
         streamResponse(modelContent, websocketData);
@@ -87,7 +48,7 @@ const processPrompt = async ({
         modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
     } while (call);
 
-    return { contents };
+    return { contents, tokenCount };
 };
 
 const generateContent = async ({ prompt, websocketData }, saveResponse = true) => {

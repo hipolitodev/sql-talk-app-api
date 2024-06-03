@@ -33,7 +33,7 @@ const createSocketServer = (server) => {
         return;
       }
 
-      // await validateToken(data);
+      await validateToken(data);
 
       return data;
     }
@@ -79,13 +79,15 @@ const createSocketServer = (server) => {
     }
 
     const handleIncomingMessage = async (ws, { chatId, content, useChat = false }) => {
+      const prompt = content;
+
       try {
         if (!!chatId) {
           await messages.create({
             chat_id: chatId,
             user_id: ws.user.id,
             sender: 'USER',
-            content: content,
+            content,
           });
         }
 
@@ -107,12 +109,12 @@ const createSocketServer = (server) => {
 
             modelResponse = await functionCallingChat.sendPrompt({
               chat: ws.chat,
-              prompt: content,
+              prompt,
               websocketData
             }, !!chatId);
           } else {
             modelResponse = await functionCallingGC.generateContent({
-              prompt: content,
+              prompt,
               websocketData,
             }, !!chatId);
           }
