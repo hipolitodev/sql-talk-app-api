@@ -47,17 +47,17 @@ const processPrompt = async ({
 
       const functionResponse = functionContent?.parts.find(part => Boolean(part.functionResponse))?.functionResponse;
       message = [{ functionResponse }]
-    }
 
-    // NOTE: wait time caused by model limits on my account, disable if not needed
-    modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
+      // NOTE: wait time caused by model limits on my account, disable if not needed
+      modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
+    }
   } while (call);
 
   return { contents, tokenCount };
 };
 
 const sendPrompt = async ({ chat, prompt, websocketData }, saveResponse = true) => {
-  const response = processPrompt({
+  const content = await processPrompt({
     prompt,
     chat,
     websocketData
@@ -71,7 +71,7 @@ const sendPrompt = async ({ chat, prompt, websocketData }, saveResponse = true) 
     });
   }
 
-  return response
+  return content
 };
 
 module.exports = {

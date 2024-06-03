@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const jwt = require('jsonwebtoken');
 const messages = require('../services/messages.service');
-const functionCallingChat = require('../services/functionCalling/index');
+const functionCallingChat = require('../services/functionCalling/chat');
 const functionCallingGC = require('../services/functionCalling/generateContent');
 const logger = require('../utils/logger.util');
 
@@ -33,7 +33,10 @@ const createSocketServer = (server) => {
         return;
       }
 
-      await validateToken(data);
+      const isValid = await validateToken(data);
+      if (!isValid) {
+        return;
+      }
 
       return data;
     }
@@ -60,13 +63,14 @@ const createSocketServer = (server) => {
             message: 'Token is required',
           }),
         );
-        return;
+        return false;
       }
 
       try {
         const user = await verifyToken(token);
         ws.user = user;
         logger.info(`User ${user.id} authenticated successfully`);
+        return true;
       } catch (err) {
         ws.send(
           JSON.stringify({
@@ -75,12 +79,11 @@ const createSocketServer = (server) => {
             message: 'Invalid token',
           }),
         );
+        return false;
       }
     }
 
-    const handleIncomingMessage = async (ws, { chatId, content, useChat = false }) => {
-      const prompt = content;
-
+    const handleIncomingMessage = async (ws, { chatId, content, useChatMethod = 'no' }) => {
       try {
         if (!!chatId) {
           await messages.create({
@@ -90,7 +93,14 @@ const createSocketServer = (server) => {
             content,
           });
         }
+      } catch (error) {
+        logger.info(error);
+        ws.send(JSON.stringify({ message: 'Failed to save incoming message', error }));
+      }
 
+      try {
+        let modelResponse;
+        const prompt = content;
         const websocketData = {
           ws,
           chatData: {
@@ -99,47 +109,46 @@ const createSocketServer = (server) => {
           },
         };
 
-        let modelResponse;
-        try {
-          if (useChat) {
-            if (!ws.chat) {
-              const { chat } = await functionCallingChat.startChat();
-              ws.chat = chat;
-            }
-
-            modelResponse = await functionCallingChat.sendPrompt({
-              chat: ws.chat,
-              prompt,
-              websocketData
-            }, !!chatId);
-          } else {
-            modelResponse = await functionCallingGC.generateContent({
-              prompt,
-              websocketData,
-            }, !!chatId);
+        if (useChatMethod === 'yes') {
+          if (!ws.chat) {
+            const { chat } = await functionCallingChat.startChat();
+            ws.chat = chat;
           }
 
-          ws.send(
-            JSON.stringify({
-              sender: 'MODEL',
-              content: modelResponse,
-            }),
-          );
-        } catch (error) {
-          if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
-            logger.info('WebSocket connection closed, but sendPrompt will continue running.');
-          } else {
-            throw error;
-          }
+          modelResponse = await functionCallingChat.sendPrompt({
+            chat: ws.chat,
+            prompt,
+            websocketData
+          }, !!chatId);
+        } else {
+          modelResponse = await functionCallingGC.generateContent({
+            prompt,
+            websocketData,
+          }, !!chatId);
         }
+
+        ws.send(
+          JSON.stringify({
+            sender: 'MODEL',
+            content: modelResponse,
+          }),
+        );
       } catch (error) {
-        logger.info(error);
-        ws.send(JSON.stringify({ message: 'Failed to process message', error }));
+        if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
+          logger.info('WebSocket connection closed, but sendPrompt will continue running.');
+        } else {
+          ws.send(JSON.stringify({ message: 'Failed to process message', error }));
+        }
       }
     };
 
     ws.on('message', async (message) => {
       const validatedMessage = await validateMessage(message);
+
+      if (!validatedMessage) {
+        return;
+      }
+
       handleIncomingMessage(ws, validatedMessage);
     });
 

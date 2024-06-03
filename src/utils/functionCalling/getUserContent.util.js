@@ -4,10 +4,10 @@ const getUserContent = (prompt) => {
     const enhancedPrompt = getEnhancedPrompt(prompt);
 
     return {
+        role: 'user',
         parts: [
             { text: enhancedPrompt }
         ],
-        role: 'user'
     }
 }
 

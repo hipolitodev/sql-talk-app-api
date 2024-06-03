@@ -93,3 +93,7 @@ This asynchronous function sends a prompt. It processes the prompt using the `pr
 ## Exports
 
 This module exports the `startChat` and `sendPrompt` functions.
+
+## Examples
+
+You can find and example of usage in [examples/chat.example.js](../../examples/chat.example.js)

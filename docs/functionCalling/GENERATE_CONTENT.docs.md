@@ -93,3 +93,7 @@ This asynchronous function generates content for a given prompt. It gets the use
 ## Exports
 
 This module exports the `generateContent` function.
+
+## Examples
+
+You can find and example of usage in [examples/generateContent.example.js](../../examples/generateContent.example.js)

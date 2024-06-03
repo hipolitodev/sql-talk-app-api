@@ -74,4 +74,6 @@ Please refer to the [API documentation](https://sql-talk-app-api.hipolito.dev/ap
 
 ## Function Calling Documentation
 
-
+- [Chat Documentation](docs/functionCalling/CHAT.docs.md)
+- [Generate Content Documentation](docs/functionCalling/GENERATE_CONTENT.docs.md)
+- [WebSocket server Documentation](docs/WEBSOCKET.docs.md)

@@ -36,16 +36,16 @@ const processPrompt = async ({
         contents.push(modelContent);
         streamResponse(modelContent, websocketData);
 
-        call = modelContent?.parts.find(part => Boolean(part.functionCall))?.functionCall;
+        call = modelContent?.parts?.find(part => Boolean(part.functionCall))?.functionCall;
 
         if (call) {
             const functionContent = await handleFunctionCall(call);
             contents.push(functionContent);
             streamResponse(functionContent, websocketData)
-        }
 
-        // NOTE: wait time caused by model limits on my account, disable if not needed
-        modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
+            // NOTE: wait time caused by model limits on my account, disable if not needed
+            modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
+        }
     } while (call);
 
     return { contents, tokenCount };
@@ -56,12 +56,14 @@ const generateContent = async ({ prompt, websocketData }, saveResponse = true) =
     const contents = [userContent]
 
     const { model, tools } = await getModel();
-    const response = processPrompt({
+    const content = await processPrompt({
         contents,
         model,
         tools,
         websocketData,
     })
+
+    content.contents[0].parts[0].text = prompt
 
     if (saveResponse) {
         await messages.create({
@@ -71,7 +73,7 @@ const generateContent = async ({ prompt, websocketData }, saveResponse = true) =
         });
     }
 
-    return response;
+    return content;
 };
 
 module.exports = {
