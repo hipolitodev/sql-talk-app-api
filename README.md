@@ -1,6 +1,6 @@
 # SQL TALK APP API
 
-This is the backend API for the SQL TALK APP application. It uses Node.js, Express, and PostgreSQL for the backend, and Google Cloud Storage and VertexAI for file storage and AI functionalities.
+This is the backend API for the SQL TALK APP application. It uses Node.js, Express, and PostgreSQL for the backend, and Google Cloud and VertexAI for AI functionalities.
 
 ## Requirements
 
@@ -10,11 +10,11 @@ This is the backend API for the SQL TALK APP application. It uses Node.js, Expre
 
 ## Environment Variables
 
-This project uses environment variables for configuration. You can find a list of all the necessary variables and their descriptions in the [.env.example](.env.example) file in the root of the project.
+This project uses environment variables for configuration. You can find a list of all the necessary variables and their descriptions in the [.env.example](.env.example).
 
 ## Running the Application
 
-1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/sql-talk-app-api`
+1. Clone the repository: `https://github.com/hipolitodev/sql-talk-app-api`
 2. Set the environment variables.
 3. Install the dependencies: `npm install`
 4. Run the application: `npm start`
@@ -23,7 +23,7 @@ This project uses environment variables for configuration. You can find a list o
 
 If you have Docker and Docker Compose installed, you can use Docker Compose to run the application and its dependencies.
 
-1. Clone the repository: `https://gitlab.com/elaniin.hipolito.dev/sql-talk-app-api`
+1. Clone the repository: `https://github.com/hipolitodev/sql-talk-app-api`
 2. Set the environment variables.
 3. Run the application with Docker Compose: `docker-compose up`. This will start your application and the PostgreSQL database in separate Docker containers. Your application will be accessible at http://localhost:3000.
 4. When you're done, you can stop your application by running docker-compose down. This command will stop and remove the Docker containers
