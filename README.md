@@ -2,41 +2,15 @@
 
 This is the backend API for the SQL TALK APP application. It uses Node.js, Express, and PostgreSQL for the backend, and Google Cloud Storage and VertexAI for file storage and AI functionalities.
 
-## Prerequisites
+## Requirements
 
 - Node.js
-- PostgreSQL
-- A Google Cloud account
-- Vertex AI
-- A JWT secret for signing JWTs
-- A list of premium users
+- PostgreSQL database
+- A Google Cloud account with Vertex AI and related services enabled
 
 ## Environment Variables
 
-You need to set the following environment variables:
-
-### DATABASE SETTINGS
-
-- `DATABASE_URL`: The connection string for your PostgreSQL database.
-- `DB_USER`: The username for your PostgreSQL database.
-- `DB_NAME`: The name of your PostgreSQL database.
-- `DB_PASSWORD`: The password for your PostgreSQL database.
-
-### GOOGLE SETTINGS
-
-- `GOOGLE_APPLICATION_CREDENTIALS`: The path to your Google Cloud service account key file.
-
-### VERTEX API SETTINGS
-
-- `MODEL_NAME`: The name of your VertexAI model.
-- `PROJECT_ID`: Your Google Cloud project ID.
-- `LOCATION`: The location of your VertexAI model.
-- `TEMPERATURE`: The temperature for your VertexAI model.
-
-### API SETTINGS
-
-- `JWT_SECRET`: The secret for signing JWTs.
-- `PREMIUM_USERS`: A list of premium users, they will have complete access to the app.
+This project uses environment variables for configuration. You can find a list of all the necessary variables and their descriptions in the [.env.example](.env.example) file in the root of the project.
 
 ## Running the Application
 
