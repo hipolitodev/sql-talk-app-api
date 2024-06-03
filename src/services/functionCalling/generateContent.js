@@ -13,23 +13,33 @@ const {
   streamResponse,
 } = require('../../utils/functionCalling');
 
-const getModel = async () => {
+const getModel = async (modelVersion) => {
   const tools = [{ functionDeclarations }];
-  const model = await generateModel(tools, functionNames);
+  const model = await generateModel(tools, functionNames, modelVersion);
 
   return { model, tools };
 };
 
-const processPrompt = async ({ contents, model, tools, websocketData }) => {
+const processPrompt = async ({ contents, model, tools, websocketData, modelVersion }) => {
   let call = null;
   let tokenCount = 0;
+  let modelDelay;
 
-  let modelDelay = {
-    startTime: Date.now(),
-    callCount: 0,
-    maxTime: 60000,
-    maxCalls: 1,
-  };
+  if (modelVersion === '1.0') {
+    modelDelay = {
+      startTime: Date.now(),
+      callCount: 0,
+      maxTime: 12000,
+      maxCalls: 5,
+    };
+  } else {
+    modelDelay = {
+      startTime: Date.now(),
+      callCount: 0,
+      maxTime: 60000,
+      maxCalls: 1,
+    };
+  }
 
   do {
     const { response } = await model.generateContent({ contents, tools });
@@ -59,18 +69,18 @@ const processPrompt = async ({ contents, model, tools, websocketData }) => {
 };
 
 const generateContent = async (
-  { prompt, websocketData },
+  { prompt, websocketData, modelVersion },
   saveResponse = true,
 ) => {
   const userContent = getUserContent(prompt);
   const contents = [userContent];
-
-  const { model, tools } = await getModel();
+  const { model, tools } = await getModel(modelVersion);
   const content = await processPrompt({
     contents,
     model,
     tools,
     websocketData,
+    modelVersion
   });
 
   content.contents[0].parts[0].text = prompt;

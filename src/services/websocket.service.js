@@ -87,7 +87,7 @@ const createSocketServer = (server) => {
 
     const handleIncomingMessage = async (
       ws,
-      { chatId, content, useChatMethod = 'no' },
+      { chatId, content, modelVersion = '1.5', useChatMethod = 'no' },
     ) => {
       try {
         if (chatId) {
@@ -118,7 +118,7 @@ const createSocketServer = (server) => {
 
         if (useChatMethod === 'yes') {
           if (!ws.chat) {
-            const { chat } = await functionCallingChat.startChat();
+            const { chat } = await functionCallingChat.startChat(modelVersion);
             ws.chat = chat;
           }
 
@@ -127,6 +127,7 @@ const createSocketServer = (server) => {
               chat: ws.chat,
               prompt,
               websocketData,
+              modelVersion
             },
             !!chatId,
           );
@@ -135,6 +136,7 @@ const createSocketServer = (server) => {
             {
               prompt,
               websocketData,
+              modelVersion
             },
             !!chatId,
           );

@@ -4,6 +4,7 @@ const {
 } = require('../src/services/functionCalling/chat');
 
 const saveResponse = false;
+const modelVersion = '1.5';
 const websocketData = {
   ws: { send: (data) => console.log(data) },
 };
@@ -16,14 +17,14 @@ const prompts = [
   'Which product categories have the highest profit margins?',
 ];
 
-const generateContentExample = async () => {
+const chatExample = async () => {
   const promptSelected = 1;
   const { chat } = await startChat();
   const result = await sendPrompt(
-    { chat, prompt: prompts[promptSelected], websocketData },
+    { chat, prompt: prompts[promptSelected], websocketData, modelVersion },
     saveResponse,
   );
   console.log(JSON.stringify({ result }, null, 2));
 };
 
-generateContentExample();
+chatExample();

@@ -4,7 +4,6 @@ const {
   PROJECT_ID,
   LOCATION,
   GOOGLE_APPLICATION_CREDENTIALS,
-  MODEL_NAME,
   TEMPERATURE = 0,
 } = process.env;
 
@@ -14,9 +13,10 @@ const vertex_ai = new VertexAI({
   keyFilename: GOOGLE_APPLICATION_CREDENTIALS,
 });
 
-const generateModel = (tools) => {
+const generateModel = (tools, functionNames, modelVersion) => {
+  const modelName = modelVersion === '1.0' ? "gemini-1.0-pro-001" : "gemini-1.5-pro-001";
   return vertex_ai.getGenerativeModel({
-    model: MODEL_NAME,
+    model: modelName,
     generationConfig: {
       temperature: TEMPERATURE,
     },
