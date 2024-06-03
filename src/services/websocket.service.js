@@ -24,6 +24,7 @@ const createSocketServer = (server) => {
       try {
         data = JSON.parse(message);
       } catch (err) {
+        logger.error(err);
         ws.send(JSON.stringify({ error: UnableToReadMessage }));
         return;
       }
@@ -39,7 +40,7 @@ const createSocketServer = (server) => {
       }
 
       return data;
-    }
+    };
 
     const verifyToken = (token) => {
       const secret = process.env.JWT_SECRET;
@@ -72,6 +73,7 @@ const createSocketServer = (server) => {
         logger.info(`User ${user.id} authenticated successfully`);
         return true;
       } catch (err) {
+        logger.error(err);
         ws.send(
           JSON.stringify({
             type: 'auth',
@@ -81,11 +83,14 @@ const createSocketServer = (server) => {
         );
         return false;
       }
-    }
+    };
 
-    const handleIncomingMessage = async (ws, { chatId, content, useChatMethod = 'no' }) => {
+    const handleIncomingMessage = async (
+      ws,
+      { chatId, content, useChatMethod = 'no' },
+    ) => {
       try {
-        if (!!chatId) {
+        if (chatId) {
           await messages.create({
             chat_id: chatId,
             user_id: ws.user.id,
@@ -94,8 +99,10 @@ const createSocketServer = (server) => {
           });
         }
       } catch (error) {
-        logger.info(error);
-        ws.send(JSON.stringify({ message: 'Failed to save incoming message', error }));
+        logger.error(error);
+        ws.send(
+          JSON.stringify({ message: 'Failed to save incoming message', error }),
+        );
       }
 
       try {
@@ -115,16 +122,22 @@ const createSocketServer = (server) => {
             ws.chat = chat;
           }
 
-          modelResponse = await functionCallingChat.sendPrompt({
-            chat: ws.chat,
-            prompt,
-            websocketData
-          }, !!chatId);
+          modelResponse = await functionCallingChat.sendPrompt(
+            {
+              chat: ws.chat,
+              prompt,
+              websocketData,
+            },
+            !!chatId,
+          );
         } else {
-          modelResponse = await functionCallingGC.generateContent({
-            prompt,
-            websocketData,
-          }, !!chatId);
+          modelResponse = await functionCallingGC.generateContent(
+            {
+              prompt,
+              websocketData,
+            },
+            !!chatId,
+          );
         }
 
         ws.send(
@@ -135,9 +148,13 @@ const createSocketServer = (server) => {
         );
       } catch (error) {
         if (error.message === 'WebSocket is not open: readyState 3 (CLOSED)') {
-          logger.info('WebSocket connection closed, but sendPrompt will continue running.');
+          logger.info(
+            'WebSocket connection closed, but sendPrompt will continue running.',
+          );
         } else {
-          ws.send(JSON.stringify({ message: 'Failed to process message', error }));
+          ws.send(
+            JSON.stringify({ message: 'Failed to process message', error }),
+          );
         }
       }
     };
@@ -157,7 +174,7 @@ const createSocketServer = (server) => {
     });
   });
 
-  return wss
-}
+  return wss;
+};
 
 module.exports = { createSocketServer };

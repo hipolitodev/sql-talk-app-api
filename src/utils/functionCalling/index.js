@@ -4,8 +4,8 @@ const getUserContent = require('./getUserContent.util');
 const streamResponse = require('./streamResponse.util');
 
 module.exports = {
-    delay,
-    getEnhancedPrompt,
-    getUserContent,
-    streamResponse,
+  delay,
+  getEnhancedPrompt,
+  getUserContent,
+  streamResponse,
 };

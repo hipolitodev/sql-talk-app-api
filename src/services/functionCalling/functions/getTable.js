@@ -45,13 +45,10 @@ const action = async ({ table_id }) => {
     const resultComment = await pool.query(commentQuery);
     const resultColumns = await pool.query(columnQuery);
 
-    const comment = resultComment.rows[0].table_comment
-    const columns = resultColumns.rows.map((column) => column.column_name)
+    const comment = resultComment.rows[0].table_comment;
+    const columns = resultColumns.rows.map((column) => column.column_name);
 
-    return [
-      comment,
-      columns
-    ];
+    return [comment, columns];
   } catch (error) {
     return error;
   }

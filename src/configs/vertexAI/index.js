@@ -5,7 +5,7 @@ const {
   LOCATION,
   GOOGLE_APPLICATION_CREDENTIALS,
   MODEL_NAME,
-  TEMPERATURE = 0
+  TEMPERATURE = 0,
 } = process.env;
 
 const vertex_ai = new VertexAI({
@@ -14,7 +14,7 @@ const vertex_ai = new VertexAI({
   keyFilename: GOOGLE_APPLICATION_CREDENTIALS,
 });
 
-const generateModel = (tools, functionNames) => {
+const generateModel = (tools) => {
   return vertex_ai.getGenerativeModel({
     model: MODEL_NAME,
     generationConfig: {

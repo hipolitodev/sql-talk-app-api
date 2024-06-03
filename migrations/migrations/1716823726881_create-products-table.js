@@ -9,24 +9,28 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('products', {
-    id: { type: 'integer', primaryKey: true, notNull: true },
-    cost: { type: 'float', notNull: false },
-    category: { type: 'string', notNull: false },
-    name: { type: 'string', notNull: false },
-    brand: { type: 'string', notNull: false },
-    retail_price: { type: 'float', notNull: false },
-    department: { type: 'string', notNull: false },
-    sku: { type: 'string', notNull: false },
-    distribution_center_id: {
-      type: 'integer',
-      notNull: false,
-      references: '"distribution_centers"',
-      onDelete: 'cascade',
+  pgm.createTable(
+    'products',
+    {
+      id: { type: 'integer', primaryKey: true, notNull: true },
+      cost: { type: 'float', notNull: false },
+      category: { type: 'string', notNull: false },
+      name: { type: 'string', notNull: false },
+      brand: { type: 'string', notNull: false },
+      retail_price: { type: 'float', notNull: false },
+      department: { type: 'string', notNull: false },
+      sku: { type: 'string', notNull: false },
+      distribution_center_id: {
+        type: 'integer',
+        notNull: false,
+        references: '"distribution_centers"',
+        onDelete: 'cascade',
+      },
     },
-  }, {
-    comment: 'The Look fictitious e-commerce dataset - products table'
-  });
+    {
+      comment: 'The Look fictitious e-commerce dataset - products table',
+    },
+  );
 };
 
 /**

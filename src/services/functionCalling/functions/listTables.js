@@ -2,7 +2,8 @@ const pool = require('../../../configs/db.config');
 
 const declaration = {
   name: 'list_tables',
-  description: 'List tables in a dataset that will help answer the user`s question',
+  description:
+    'List tables in a dataset that will help answer the user`s question',
 };
 
 const action = async () => {

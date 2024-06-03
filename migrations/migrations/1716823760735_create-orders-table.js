@@ -9,24 +9,29 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-  pgm.createTable('orders', {
-    order_id: { type: 'integer', primaryKey: true, notNull: true },
-    user_id: {
-      type: 'integer',
-      notNull: false,
-      references: 'users',
-      onDelete: 'SET NULL',
+  pgm.createTable(
+    'orders',
+    {
+      order_id: { type: 'integer', primaryKey: true, notNull: true },
+      user_id: {
+        type: 'integer',
+        notNull: false,
+        references: 'users',
+        onDelete: 'SET NULL',
+      },
+      status: { type: 'string', notNull: false },
+      gender: { type: 'string', notNull: false },
+      created_at: { type: 'timestamp', notNull: false },
+      returned_at: { type: 'timestamp', notNull: false },
+      shipped_at: { type: 'timestamp', notNull: false },
+      delivered_at: { type: 'timestamp', notNull: false },
+      num_of_item: { type: 'integer', notNull: false },
     },
-    status: { type: 'string', notNull: false },
-    gender: { type: 'string', notNull: false },
-    created_at: { type: 'timestamp', notNull: false },
-    returned_at: { type: 'timestamp', notNull: false },
-    shipped_at: { type: 'timestamp', notNull: false },
-    delivered_at: { type: 'timestamp', notNull: false },
-    num_of_item: { type: 'integer', notNull: false },
-  }, {
-    comment: 'Programatically generated orders for The Look fictitious e-commerce store'
-  });
+    {
+      comment:
+        'Programatically generated orders for The Look fictitious e-commerce store',
+    },
+  );
 };
 
 /**

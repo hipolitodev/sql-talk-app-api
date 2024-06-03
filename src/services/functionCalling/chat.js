@@ -2,8 +2,17 @@ require('dotenv').config();
 
 const messages = require('../messages.service');
 const { generateModel } = require('../../configs/vertexAI');
-const { functionNames, functionDeclarations, handleFunctionCall } = require('./functions');
-const { delay, getEnhancedPrompt, getUserContent, streamResponse } = require('../../utils/functionCalling');
+const {
+  functionNames,
+  functionDeclarations,
+  handleFunctionCall,
+} = require('./functions');
+const {
+  delay,
+  getEnhancedPrompt,
+  getUserContent,
+  streamResponse,
+} = require('../../utils/functionCalling');
 
 const startChat = async () => {
   const tools = [{ functionDeclarations }];
@@ -13,14 +22,10 @@ const startChat = async () => {
   return { chat };
 };
 
-const processPrompt = async ({
-  prompt,
-  chat,
-  websocketData
-}) => {
+const processPrompt = async ({ prompt, chat, websocketData }) => {
   let call = null;
   let tokenCount = 0;
-  let message = getEnhancedPrompt(prompt)
+  let message = getEnhancedPrompt(prompt);
   let contents = [getUserContent(prompt)];
 
   let modelDelay = {
@@ -28,7 +33,7 @@ const processPrompt = async ({
     callCount: 1,
     maxTime: 60000,
     maxCalls: 1,
-  }
+  };
 
   do {
     const { response } = await chat.sendMessage(message);
@@ -38,29 +43,38 @@ const processPrompt = async ({
     contents.push(modelContent);
     streamResponse(modelContent, websocketData);
 
-    call = modelContent?.parts?.find(part => Boolean(part.functionCall))?.functionCall;
+    call = modelContent?.parts?.find((part) =>
+      Boolean(part.functionCall),
+    )?.functionCall;
 
     if (call) {
       const functionContent = await handleFunctionCall(call);
       contents.push(functionContent);
       streamResponse(functionContent, websocketData);
 
-      const functionResponse = functionContent?.parts.find(part => Boolean(part.functionResponse))?.functionResponse;
-      message = [{ functionResponse }]
+      const functionResponse = functionContent?.parts.find((part) =>
+        Boolean(part.functionResponse),
+      )?.functionResponse;
+      message = [{ functionResponse }];
 
       // NOTE: wait time caused by model limits on my account, disable if not needed
-      modelDelay = await delay(modelDelay, () => streamResponse('Delaying for 60s...', websocketData))
+      modelDelay = await delay(modelDelay, () =>
+        streamResponse('Delaying for 60s...', websocketData),
+      );
     }
   } while (call);
 
   return { contents, tokenCount };
 };
 
-const sendPrompt = async ({ chat, prompt, websocketData }, saveResponse = true) => {
+const sendPrompt = async (
+  { chat, prompt, websocketData },
+  saveResponse = true,
+) => {
   const content = await processPrompt({
     prompt,
     chat,
-    websocketData
+    websocketData,
   });
 
   if (saveResponse) {
@@ -71,7 +85,7 @@ const sendPrompt = async ({ chat, prompt, websocketData }, saveResponse = true) 
     });
   }
 
-  return content
+  return content;
 };
 
 module.exports = {

@@ -1,20 +1,20 @@
 const delay = async ({ startTime, callCount, maxTime, maxCalls }, onDelay) => {
-    callCount++;
+  callCount++;
 
-    if (callCount >= maxCalls) {
-        let endTime = Date.now();
-        let elapsedTime = endTime - startTime;
+  if (callCount >= maxCalls) {
+    let endTime = Date.now();
+    let elapsedTime = endTime - startTime;
 
-        if (elapsedTime < maxTime) {
-            let delay = maxTime - elapsedTime;
-            onDelay && onDelay()
-            await new Promise((resolve) => setTimeout(resolve, delay));
-        }
-
-        return { startTime: Date.now(), callCount: 0, maxTime, maxCalls };
+    if (elapsedTime < maxTime) {
+      let delay = maxTime - elapsedTime;
+      onDelay && onDelay();
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
 
-    return { startTime, callCount, maxTime, maxCalls };
-}
+    return { startTime: Date.now(), callCount: 0, maxTime, maxCalls };
+  }
 
-module.exports = delay
+  return { startTime, callCount, maxTime, maxCalls };
+};
+
+module.exports = delay;
